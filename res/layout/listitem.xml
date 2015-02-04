@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/checked"
+        android:layout_marginTop="8dp">
+<LinearLayout
+              android:orientation="horizontal"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+        >
+    <ImageView
+            android:layout_marginLeft="10dp"
+            android:id="@+id/img_pre"
+            android:src="@drawable/hero_airport_wifi"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:scaleType="fitXY"
+            android:layout_gravity="center"
+            />
+
+    <TextView
+            android:id="@+id/text"
+            android:layout_width="160dp"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:text="BUPT-1"
+            android:singleLine="true"
+            />
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="right"
+            android:layout_weight="2"
+            >
+        <ImageView
+                android:id="@+id/img"
+                android:src="@drawable/login"
+                android:layout_width="45dp"
+                android:layout_height="35dp"
+                android:paddingRight="10dp"
+                android:scaleType="fitXY"
+                android:layout_gravity=""
+                />
+    </LinearLayout>
+</LinearLayout>
+    <ProgressBar
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_marginTop="-2dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginBottom="3dp"
+            android:layout_width="fill_parent"
+            android:layout_height="4dp"
+            android:progress="90"
+            android:id="@+id/progressBar2"/>
+</LinearLayout>

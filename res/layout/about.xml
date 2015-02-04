@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+   <ImageView android:layout_width="match_parent" android:layout_height="280dp"
+           android:src="@drawable/wireless"
+           android:layout_centerHorizontal="true"
+           android:scaleType="fitCenter"
+           android:padding="25dp"
+           />
+    <TextView android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:text="@string/app_name"
+              android:textAlignment="center"
+              android:textSize="40sp"
+              android:layout_gravity="center_vertical"
+              android:gravity="center"
+              android:fontFamily="微软雅黑"
+            />
+    <TextView android:layout_marginTop="20dp"
+            android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:text="@string/app_about1"
+              android:textAlignment="center"
+              android:textSize="20sp"
+              android:layout_gravity="center_vertical"
+              android:gravity="center"
+              android:fontFamily="微软雅黑"
+            />
+    <TextView android:layout_marginTop="20dp"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:text="@string/app_version"
+              android:textAlignment="center"
+              android:textSize="20sp"
+              android:layout_gravity="center_vertical"
+              android:gravity="center"
+              android:fontFamily="微软雅黑"
+            />
+    <Button
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:text="@string/check_update"
+            android:onClick="checkupdate"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+
+</LinearLayout>

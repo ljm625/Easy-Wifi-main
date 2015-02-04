@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:key="using_categories_in_root_screen"
+                  android:summary="Using Preference Categories"
+                  android:background="@color/default_color"
+                  android:title="设置" >
+
+    <PreferenceCategory
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:key="wifi_set"
+            android:summary="Preferences related to setting"
+            android:title=" " >
+        <SwitchPreference
+                android:key="auto_save_setting"
+                android:title="是否自动保存WIFI热点" />
+        <SwitchPreference
+                android:key="update_check_setting"
+                android:title="自动检测升级" />
+        <SwitchPreference
+                android:key="default_setting"
+                android:title="设为默认wifi工具" />
+        <SwitchPreference
+                android:key="handsome_setting"
+                android:title="我就问你我帅不帅"
+                />
+    </PreferenceCategory>
+
+</PreferenceScreen>

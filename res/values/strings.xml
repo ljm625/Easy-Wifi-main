@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Easy Wifi</string>
+    <string name="Button_Connect">连接</string>
+    <string name="Button_Cancel">取消</string>
+    <string name="drawer_open">打开</string>
+    <string name="drawer_close">关闭</string>
+    <string name="user_name">Jia Leon</string>
+    <string name="user_email">ljm625@gmail.com</string>
+    <string name="app_home">主页</string>
+    <string name="app_wifi">Wi-Fi连接</string>
+    <string name="app_settings">设置</string>
+    <string name="app_about">关于</string>
+    <string name="app_about1">致力于做最好的Android Wi-Fi软件</string>
+    <string name="app_version">当前版本：1.0.1 Beta</string>
+    <string name="check_update">检查更新</string>
+    <string name="new_version">已是最新版本</string>
+
+
+
+
+
+
+</resources>
