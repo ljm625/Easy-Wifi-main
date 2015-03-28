@@ -1,21 +1,27 @@
 package com.easygo.easywifi;
 
-import android.app.Activity;
-import android.app.DialogFragment;
-import android.app.Fragment;
-import android.app.FragmentManager;
+import android.app.*;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.preference.PreferenceManager;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.*;
 import android.widget.*;
 import com.baidu.location.BDLocation;
@@ -26,7 +32,23 @@ import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.map.*;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.location.LocationClientOption.LocationMode;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.HTTP;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.*;
 
 /**
@@ -51,16 +73,24 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
     private int mXDirection;
     WifiTest wifiadmin;
     WifiManager wific;
+    public int counter = 0;
+    TextView tv;
+    Timer timer = new Timer(true);
+    private static Handler handler2;
     private MapFragmentOne baidu;
     private int selectedIndex;
+    private int requestnum,wifinum;
+    private Bundle wifibundle;
     private int selectedColor = Color.parseColor("#1b1b1b");
     private ScanResult sr,sr1;
+    private List<WifiInfo> mlist=new ArrayList<WifiInfo>();
     private WifiFragment wifif=new WifiFragment();
     private Long ts;
     private ListView mDrawerList,mLeftDrawer;
     private LinearLayout leftRL;
     private DrawerLayout drawerLayout;
     private static View bdmap;
+    private boolean uploaded=false;
     private int[] DrawerItemName={R.string.app_home,R.string.app_wifi,R.string.app_settings,R.string.app_about};
     private int[] DrawerItemIcon={R.drawable.home,R.drawable.wifi2,R.drawable.settings,R.drawable.about};
     java.util.List<ScanResult> List1,List3;
@@ -90,8 +120,8 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
 
             }else{
                 //int Netid=wifiadmin.addNetwork(wifiConfig);
+                wifiadmin.disconnect_current();
                 wifiadmin.addNetwork(wifiConfig);
-
                 //Toast.makeText(Second_Win.this,"connect succeed!",1).show();
 
             }
@@ -102,8 +132,8 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
 
             }else{
                 //int Netid=wifiadmin.addNetwork(wifiConfig);
+                wifiadmin.disconnect_current();
                 wifiadmin.addNetwork(wifiConfig);
-
                 //Toast.makeText(Second_Win.this,"connect succeed!",1).show();
 
             }
@@ -131,6 +161,190 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
         System.out.println("start-->location");
 
     }
+    public class WifiInfo   //2015.3.10 Changed by Ljm625 设置一个类当做结构体使用
+    {
+        public String ssid;
+        public String mac;
+        public Double longtitude;
+        public Double latitude;
+        public int uplink;
+        public int downlink;
+        public int signal;
+        public String encryption;
+        public String passwd;
+        public int rate;
+    }
+    public void onReconnect(View v)
+    {
+        wifiadmin.disconnect_current();
+
+    }
+    Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            Bundle data = msg.getData();
+
+            for (int i = 0; i < mlist.size(); i++) {
+               WifiInfo tmp=  mlist.get(i);
+                Double latitude = tmp.latitude;
+                Double longtitude = tmp.longtitude;
+                SB = SB.append(" " + tmp.ssid + " ");
+                System.out.println("SSID-->" + tmp.ssid);
+
+                System.out.println("Encrypt-->" + tmp.encryption);
+
+
+
+                LatLng point = new LatLng(latitude, longtitude);
+                SetButton(i, tmp.ssid, point, tmp.encryption, tmp.signal);
+            }
+            // TODO: UI界面的更新等相关操作
+            // 
+        }
+    };
+    Runnable networkTask = new Runnable() {
+
+
+
+        @Override
+        public void run() {
+            // TODO
+            // 在这里进行 http request.网络请求相关操作
+            Bundle data = new Bundle();
+            System.out.println("Starting fingding data");
+            for (int i = 0; i < List1.size(); i++)
+            {
+            sr=List1.get(i);
+                int level=wific.calculateSignalLevel(sr.level,100);
+                     int start=sr.capabilities.indexOf('[');
+                     int stop=sr.capabilities.indexOf(']');
+                     sr.capabilities=sr.capabilities.substring(start+1,stop);
+                WifiInfo tmpwifi=new WifiInfo();                       //2015.3.10 Changed by Ljm625
+            try {
+                HttpPost request = new HttpPost("http://www.52mzone.com/easywifi/ewifi.php");
+                //2015.3.10 Changed by Ljm625
+                List<NameValuePair> params = new ArrayList<NameValuePair>();
+                params.add(new BasicNameValuePair("SSID", sr.SSID));
+                params.add(new BasicNameValuePair("MAC_ID", sr.BSSID));
+                params.add(new BasicNameValuePair("latitude", mCurrentLantitude + ""));
+                params.add(new BasicNameValuePair("longtitude", mCurrentLongitude + ""));
+                params.add(new BasicNameValuePair("encrypt", sr.capabilities));
+                params.add(new BasicNameValuePair("signal", level + ""));
+                HttpEntity httpentity = new UrlEncodedFormEntity(params,HTTP.UTF_8);
+               // request.setEntity(new StringEntity(params.toString(), HTTP.UTF_8));
+
+                // 键为null或使用json不支持的数字格式(NaN, infinities)
+                request.setEntity(httpentity);
+
+                HttpClient httpclient = new DefaultHttpClient();
+                HttpResponse httpResponse = httpclient.execute(request);
+                if(httpResponse.getStatusLine().getStatusCode()==200) {
+
+                    String retSrc = EntityUtils.toString(httpResponse.getEntity());
+                    JSONObject result = new JSONObject(retSrc);
+                    tmpwifi.ssid=result.getString("ssid");
+                    tmpwifi.mac=result.getString("mac");
+                    tmpwifi.encryption=sr.capabilities;
+                    tmpwifi.uplink=result.getInt("uplink");
+                    tmpwifi.downlink=result.getInt("downlink");
+                   Boolean islocated=result.getBoolean("islocated");
+                    tmpwifi.signal=level;
+                    System.out.println("This locate is generated by web"+" ssid---->"+tmpwifi.ssid);
+                    System.out.println("This locate is generated by web"+" locate---->"+islocated);
+
+                    //  data.putInt("uplink", result.getInt("uplink"));
+                //    data.putInt("downlink",result.getInt("downlink"));
+                //    data.putString("islocated", result.getString("islocated"));
+                  //  data.putDouble("latitude", result.getDouble("latitude"));
+                  //  data.putDouble("longtitude",result.getDouble("longtitude"));
+                  //  data.putInt("rate", result.getInt("rate"));
+                  //  data.putString("passwd", result.getString("pass"));
+                    if (islocated == true) {
+                   tmpwifi.latitude = result.getDouble("latitude");
+                   tmpwifi.longtitude = result.getDouble("longtitude");
+                        System.out.println("This locate is generated by web"+"---->"+tmpwifi.ssid);
+                    }
+                    else {
+                        Double latitude=mCurrentLantitude;
+                        Double longtitude=mCurrentLongitude;
+                        double plus=0.0001;
+                           Long tsLong = System.currentTimeMillis()/1000;
+                           Random r = new Random(tsLong+i);
+                           int ran1=r.nextInt(5);
+                            Boolean isright=r.nextBoolean();
+                            for(int g=0;g<ran1+1;g++)
+                            {
+                                if(isright)
+
+                                    latitude=latitude+plus;
+                                else
+                                    latitude=latitude-plus;
+                            }
+                            Random r1 = new Random(tsLong+10*i);
+                            ran1=r1.nextInt(5);
+                            isright=r1.nextBoolean();
+                            for(int g=0;g<ran1+1;g++)
+                            {
+                               if(isright)
+
+                                    longtitude=longtitude-plus;
+                                else
+                                    longtitude=longtitude+plus;
+                            }
+                        tmpwifi.latitude=latitude;
+                        tmpwifi.longtitude=longtitude;
+                    }
+                    tmpwifi.rate = result.getInt("rate");
+                   tmpwifi.passwd = result.getString("pass");
+                }
+
+            } catch (ClientProtocolException cp)
+            {
+                throw new RuntimeException(cp);
+
+            }
+            catch (IOException ie)
+            {
+                throw new RuntimeException(ie);
+
+            }
+            catch (JSONException ex)
+            {
+                throw new RuntimeException(ex);
+            }
+                mlist.add(i,tmpwifi); //打包信息进入Wifiinfo的List 这样可以统一管理、类似结构体
+                System.out.println("The id is "+i);
+            }
+            Message msg = new Message();
+            data.putString("value", "请求结果");
+            msg.setData(data);
+            handler.sendMessage(msg);
+        }
+    };
+
+    public static boolean isConnect(Context context) {
+        // 获取手机所有连接管理对象（包括对wi-fi,net等连接的管理）
+        try {
+            ConnectivityManager connectivity = (ConnectivityManager) context
+                    .getSystemService(Context.CONNECTIVITY_SERVICE);
+            if (connectivity != null) {
+                // 获取网络连接管理的对象
+                NetworkInfo info = connectivity.getActiveNetworkInfo();
+                if (info != null&& info.isConnected()) {
+                    // 判断当前网络是否已经连接
+                    if (info.getState() == NetworkInfo.State.CONNECTED) {
+                        return true;
+                    }
+                }
+            }
+        } catch (Exception e) {
+// TODO: handle exception
+            Log.v("error", e.toString());
+        }
+        return false;
+    }
+
     private void initWifi()
     {
         wifiadmin=new WifiTest(this);
@@ -145,53 +359,97 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
         double longtitude=mCurrentLongitude;
 
         if (List1 != null) {
-            for (int i = 0; i < List1.size(); i++) {
-                sr = List1.get(i);
-                int level=wific.calculateSignalLevel(sr.level,100);
+           // for (int i = 0; i < List1.size(); i++) {
+           //     sr = List1.get(i);
+           //     int level=wific.calculateSignalLevel(sr.level,100);
+           //     int start=sr.capabilities.indexOf('[');
+           //     int stop=sr.capabilities.indexOf(']');
+           //     sr.capabilities=sr.capabilities.substring(start+1,stop);
+           //     WifiInfo tmpwifi=new WifiInfo();                       //2015.3.10 Changed by Ljm625
+           //     tmpwifi.ssid=sr.SSID;
+           //     tmpwifi.mac=sr.BSSID;
+           //     tmpwifi.signal=level;
+           //     String islocated;
+
+             if(uploaded==false) {
+
+                 if (isConnect(this)==true) {
+                     new Thread(networkTask).start();
+                 }else;
+             } else {
+                 System.out.println("Not Getting Data From Server");
+                 Message msg = new Message();
+                 Bundle data=new Bundle();
+                 data.putString("value", "请求结果");
+                 msg.setData(data);
+                 handler.sendMessage(msg);
+             }
+
+
+
+
+/**
+ * 网络操作相关的子线程
+ */
+
+
+
                 //添加侧边栏的WIFI列表
-                System.out.println("Signal------->"+level+"");
+              //  System.out.println("Signal------->"+level+"");
                //设置坐标等信息的显示
-                latitude=mCurrentLantitude;
-                longtitude=mCurrentLongitude;
-                SB = SB.append(" " + sr.SSID + " ");
-                System.out.println("SSID-->"+sr.SSID);
-                int start=sr.capabilities.indexOf('[');
-                int stop=sr.capabilities.indexOf(']');
-                sr.capabilities=sr.capabilities.substring(start+1,stop);
-                System.out.println("Encrypt-->"+sr.capabilities);
 
-                Long tsLong = System.currentTimeMillis()/1000;
-                Random r = new Random(tsLong+i);
-                int ran1=r.nextInt(5);
-                Boolean isright=r.nextBoolean();
-                for(int g=0;g<ran1+1;g++)
-                {
-                    if(isright)
 
-                    latitude=latitude+plus;
-                    else
-                    latitude=latitude-plus;
-                }
-                Random r1 = new Random(tsLong+10*i);
-                ran1=r1.nextInt(5);
-                isright=r1.nextBoolean();
-                for(int g=0;g<ran1+1;g++)
-                {
-                    if(isright)
 
-                        longtitude=longtitude-plus;
-                    else
-                        longtitude=longtitude+plus;
-                }
-
-                LatLng point = new LatLng(latitude, longtitude);
-                SetButton(i,sr.SSID,point,sr.capabilities,level);
-
-            }
 
         }
     }
+    public Boolean getSetting() {
+        SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(this);
 
+        // SharedPreferences prefs = getSharedPreferences("com.easygo.easywifi_settings", Context.MODE_WORLD_READABLE);
+        Boolean setdefault = prefs.getBoolean("quit_setting", false);  //false表示没有查到checkbox这个key的返回值
+        Boolean setupdate = prefs.getBoolean("update_check_setting", false);  //false表示没有查到checkbox这个key的返回值
+        Boolean setquit = prefs.getBoolean("default_setting", false);  //false表示没有查到checkbox这个key的返回值
+        Boolean setnotification =prefs.getBoolean("notification_setting", false);  //false表示没有查到checkbox这个key的返回值
+        System.out.println(setnotification);
+        return setnotification;
+    }
+    private void notification(){
+        String WifID=null;
+        android.net.wifi.WifiInfo wifiinfo=wifiadmin.checkinfo();
+        WifID=wifiinfo.getSSID().toString();
+        NotificationCompat.Builder mBuilder;
+        if (WifID=="0x")
+        {
+            mBuilder =
+                    new NotificationCompat.Builder(this)
+                            .setSmallIcon(R.drawable.wifi)
+                            .setContentTitle("EasyWifi is running ")
+                            .setContentText("Not Connected ");
+        }
+        else {
+            mBuilder =
+                    new NotificationCompat.Builder(this)
+                            .setSmallIcon(R.drawable.wifi)
+                            .setContentTitle("EasyWifi is running ")
+                            .setContentText("Connecting to " + WifID);
+        }
+        Intent resultIntent = new Intent(this, EasyWifiMain.class);
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        stackBuilder.addParentStack(EasyWifiMain.class);
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent =
+                stackBuilder.getPendingIntent(
+                        0,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                );
+        mBuilder.setContentIntent(resultPendingIntent);
+        NotificationManager mNotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        int mId = 001;
+        mNotificationManager.notify(mId, mBuilder.build());
+
+    }
     private void SetButton(int i,String SSID,LatLng point,String authtype,int signallevel)
     {
         Bundle extrainfo=new Bundle();
@@ -216,6 +474,8 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
         //extrainfo.putString("id","1");
         extrainfo.putInt("id",i);
         extrainfo.putInt("signal",signallevel);
+        extrainfo.putInt("uplink",i);
+        extrainfo.putInt("downlink",signallevel);
         extrainfo.putString("SSID",SSID);
         extrainfo.putString("auth", authtype);
         extrainfo.putBoolean("isopen",false);
@@ -249,7 +509,7 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
                 savedinfo.putInt("signal",signal);
 
 
-                if (auth.indexOf("ESS") >= 0) {
+                if (auth.indexOf("ESS") >= 0 ||auth.indexOf("WPS") >= 0) {
                     savedinfo.putBoolean("encrypt", false);
                 } else {
                     savedinfo.putBoolean("encrypt", true);
@@ -303,6 +563,8 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
     @Override
     protected void onStart() {
         super.onStart();
+
+
        baidu.getBaidu().setMyLocationEnabled(true);
         BitmapDescriptor mLocMarker = BitmapDescriptorFactory
                 .fromResource(R.drawable.custom_loc);
@@ -390,6 +652,58 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
         SDKInitializer.initialize(getApplicationContext());
 
 
+
+
+
+        handler2 =new Handler(){
+            public void handleMessage(Message msg){
+                switch(msg.what){
+                    case 1:
+                        Boolean test=getSetting();
+                        if(test==true) notification();
+                        break;
+                }
+                super.handleMessage(msg);
+            }
+        };
+        TimerTask task = new TimerTask(){
+            @Override
+            public void run() {
+                // TODO Auto-generated method stub
+                counter=counter+1;
+                Message message = new Message();
+                message.what=1;
+                handler2.sendMessage(message);
+            }
+        };
+        timer.schedule(task, 0,1000);
+
+
+
+
+
+
+
+
+
+
+
+
+
+        if (isConnect(this)==false)
+        {
+            new AlertDialog.Builder(this)
+                    .setTitle(R.string.network_error)
+                    .setMessage(R.string.network_message)
+                    .setPositiveButton(R.string.drawer_close, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface arg0, int arg1) {
+// TODO Auto-generated method stub
+                            android.os.Process.killProcess(android.os.Process.myPid());
+                            System.exit(0);
+                        }
+                    }).show();
+        }
 
         mLocationClient = new LocationClient(getApplicationContext());     //声明LocationClient类
         mLocationClient.registerLocationListener(myListener);
@@ -543,7 +857,7 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
                 getActionBar().setTitle(R.string.app_wifi);
                 getFragmentManager().beginTransaction().replace(R.id.content_frame, wifif).commit();
 
-          //      wifif.UpdateText("fuck","fuck");
+              // wifif.UpdateText("fuck","fuck");
 
             }
         }

@@ -7,10 +7,14 @@ import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Bundle;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class WifiTest {
     private WifiInfo mWifiInfo;
+    private WifiInfo mWifiInfo2;
     private WifiManager mWifiManager;
     private List<ScanResult> mWifiList;
     private List<WifiConfiguration> mWifiConfiguration;
@@ -30,27 +34,71 @@ public class WifiTest {
             //wifiLock.acquire();
         }
     }
+
+    public WifiInfo getConnection()
+    {
+        WifiInfo mInfo=mWifiManager.getConnectionInfo();
+        return  mInfo;
+    }
+
+    public int TransNum(){
+        int str;
+        int i=mWifiManager.getWifiState();
+        switch (i){
+            case 0:
+                str= R.string.closing;
+                break;
+            case 1:
+                str=R.string.unable;
+                break;
+            case 2:
+                str=R.string.opening;
+                break;
+            case 3:
+                str=R.string.connected;
+                break;
+            default:
+                str=R.string.nodata;
+                break;
+        }
+        return str;
+    }
     public void closeWifi(){
         if (mWifiManager.isWifiEnabled()){
             mWifiManager.setWifiEnabled(false);
             //wifiLock.release();
         }
     }
+
+    public void disconnect_current(){
+        mWifiInfo2=mWifiManager.getConnectionInfo();
+        int current_id=0;
+        current_id=mWifiInfo2.getNetworkId();
+        if (current_id!=0){
+            //mWifiManager.disableNetwork(current_id);
+            mWifiManager.disconnect();
+        }
+    }
+
     public int checkstate(){
         return mWifiManager.getWifiState();
     }
+
     public WifiInfo checkinfo()
     {
         return mWifiManager.getConnectionInfo();
     }
+
     public void startScan(){
         mWifiManager.startScan();
         mWifiList=mWifiManager.getScanResults();
         mWifiConfiguration=mWifiManager.getConfiguredNetworks();
     }
+
     public List<ScanResult> getmWifiList(){
         return mWifiList;
     }
+
     public  WifiConfiguration CreateWifiInfo(String SSID, String Password, int Type)
     {
         WifiConfiguration config = new WifiConfiguration();
@@ -95,7 +143,9 @@ public class WifiTest {
             config.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
             config.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
             config.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.TKIP);
-            config.allowedProtocols.set(WifiConfiguration.Protocol.WPA);
+            config.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
+            config.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
+            config.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.CCMP);
             config.status = WifiConfiguration.Status.ENABLED;
             return config;
         }
@@ -111,11 +161,15 @@ public class WifiTest {
         }
         return null;
     }
+
+
+
     public void addNetwork(WifiConfiguration wcg) { // 添加一个网络配置并连接
+
         int wcgID = mWifiManager.addNetwork(wcg);
-        mWifiManager.disconnect();
+        //mWifiManager.disconnect();
         mWifiManager.enableNetwork(wcgID,true);
-        mWifiManager.reconnect();
+        //mWifiManager.reconnect();
 
     }
 

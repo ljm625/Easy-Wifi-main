@@ -3,7 +3,7 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
                   android:key="using_categories_in_root_screen"
                   android:summary="Using Preference Categories"
-                  android:background="@color/default_color"
+                  android:background="#e0f7fa"
                   android:title="设置" >
 
     <PreferenceCategory
@@ -12,18 +12,19 @@
             android:summary="Preferences related to setting"
             android:title=" " >
         <SwitchPreference
-                android:key="auto_save_setting"
-                android:title="是否自动保存WIFI热点" />
+                android:key="quit_setting"
+                android:title="退出时提醒" />
         <SwitchPreference
                 android:key="update_check_setting"
-                android:title="自动检测升级" />
+                android:title="启动时检查升级" />
         <SwitchPreference
                 android:key="default_setting"
                 android:title="设为默认wifi工具" />
         <SwitchPreference
-                android:key="handsome_setting"
-                android:title="我就问你我帅不帅"
+                android:key="notification_setting"
+                android:title="显示状态栏图标信息"
                 />
+
     </PreferenceCategory>
 
 </PreferenceScreen>
