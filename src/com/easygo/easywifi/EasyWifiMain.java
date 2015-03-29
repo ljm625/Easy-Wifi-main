@@ -51,7 +51,7 @@ import java.util.*;
 /**
  * Created by TrixZ on 2014/9/19.
  */
-public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeDialogListener
+public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeDialogListener, SpeedTest.NoticeDialogListener1
 {
     // The dialog fragment receives a reference to this Activity through the
     // Fragment.onAttach() callback, which it uses to call the following methods
@@ -82,11 +82,14 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
     private BaiduMap mBaiduMap;
     private MyLocationListener mMyLocationListener;
     private float mCurrentAccracy;
+    private SpeedTest speedTest;
+    private InfoDialog infoDialog;
     private int mXDirection;
     private MapFragmentOne baidu;
     private int selectedIndex;
     private int requestnum,wifinum;
     private Bundle wifibundle;
+    private Bundle globalbundle; //新添加修改SAVEDBUNDLE
     private int selectedColor = Color.parseColor("#1b1b1b");
     private ScanResult sr,sr1;
     private List<WifiInfo> mlist=new ArrayList<WifiInfo>();
@@ -287,12 +290,32 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
 
             }
         }
+        //清空对话框
+        infoDialog = null;
+    }
+
+
+    public void onDialogPositiveClick1(DialogFragment dialog) {
+        // User touched the dialog's positive button
+//        View DialogView =test.inflate(R.layout.infowin,null);
+        //    EditText passwd1=(EditText)DialogView.findViewById(R.id.password);
+        //     String pass=passwd1.getText().toString();
 
     }
+
+    public void onDialogNegativeClick1(DialogFragment dialog) {
+        // User touched the dialog's positive button
+//        View DialogView =test.inflate(R.layout.infowin,null);
+        //    EditText passwd1=(EditText)DialogView.findViewById(R.id.password);
+        //     String pass=passwd1.getText().toString();
+        speedTest = null;
+    }
+
 
     @Override
     public void onDialogNegativeClick(DialogFragment dialog) {
         // User touched the dialog's negative button
+        infoDialog = null;
     }
 
     private void initMyLocation() {
@@ -384,7 +407,7 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
         Boolean setupdate = prefs.getBoolean("update_check_setting", false);  //false表示没有查到checkbox这个key的返回值
         Boolean setquit = prefs.getBoolean("default_setting", false);  //false表示没有查到checkbox这个key的返回值
         Boolean setnotification =prefs.getBoolean("notification_setting", false);  //false表示没有查到checkbox这个key的返回值
-        System.out.println(setnotification);
+        // System.out.println(setnotification);
         return setnotification;
     }
 
@@ -463,7 +486,7 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
             @Override
             public boolean onMarkerClick(Marker marker) {
 
-                System.out.println("Positioned!");
+                //System.out.println("Positioned!");
                 Bundle temp = marker.getExtraInfo();
                 String tmpid = temp.getString("id");
                 String SSID = temp.getString("SSID");
@@ -477,21 +500,22 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
                 System.out.println("Auth--->" + auth);
 
 
-                Bundle savedinfo = new Bundle();
-                savedinfo.putString("SSID", SSID);
-                savedinfo.putInt("up", up);
-                savedinfo.putInt("down", down);
-                savedinfo.putInt("signal",signal);
+                globalbundle = new Bundle();
+                globalbundle.putString("SSID", SSID);
+                globalbundle.putInt("up", up);
+                globalbundle.putInt("down", down);
+                globalbundle.putInt("signal", signal);
 
 
                 if (auth.indexOf("ESS") >= 0 ||auth.indexOf("WPS") >= 0) {
-                    savedinfo.putBoolean("encrypt", false);
+                    globalbundle.putBoolean("encrypt", false);
                 } else {
-                    savedinfo.putBoolean("encrypt", true);
+                    globalbundle.putBoolean("encrypt", true);
                 }
-                InfoDialog Showdialog = new InfoDialog();
-                Showdialog.show(getFragmentManager(), "Dialog", savedinfo);
-
+                infoDialog = new InfoDialog();
+                infoDialog.show(getFragmentManager(), "Dialog", globalbundle);
+                //     speedTest=new SpeedTest();                            //测试用
+                //        speedTest.show(getFragmentManager(), "speed");
                 boolean tmpopen = temp.getBoolean("isopen");
 
                 return true;
@@ -519,7 +543,18 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
 
     @Override
     protected void onResume() {
-        super.onResume();
+
+        super.onResume();      //2015.3.29 修复一个对话框引起的crash
+        if (infoDialog != null) {
+            if (!infoDialog.isAdded()) {
+                infoDialog.show(getFragmentManager(), "Dialog", globalbundle);
+            }
+        }
+        if (speedTest != null) {
+            if (!infoDialog.isAdded()) {
+                speedTest.show(getFragmentManager(), "speed");
+            }
+        }
 //        mMapView.onResume();
     }
 
@@ -840,19 +875,19 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
             int up = r.nextInt(10);
             int down = r.nextInt(10);
             System.out.println("Auth--->" + auth);
-            Bundle savedinfo = new Bundle();
-            savedinfo.putString("SSID", SSID);
-            savedinfo.putInt("up", up);
-            savedinfo.putInt("down", down);
-            savedinfo.putInt("signal", level);
+            globalbundle = new Bundle();
+            globalbundle.putString("SSID", SSID);
+            globalbundle.putInt("up", up);
+            globalbundle.putInt("down", down);
+            globalbundle.putInt("signal", level);
 
             if (auth.indexOf("ESS") >= 0) {
-                savedinfo.putBoolean("encrypt", false);
+                globalbundle.putBoolean("encrypt", false);
             } else {
-                savedinfo.putBoolean("encrypt", true);
+                globalbundle.putBoolean("encrypt", true);
             }
-            InfoDialog Showdialog = new InfoDialog();
-            Showdialog.show(getFragmentManager(), "Dialog", savedinfo);
+            infoDialog = new InfoDialog();
+            infoDialog.show(getFragmentManager(), "Dialog", globalbundle);
 
 
             mDrawerList.setItemChecked(i, true);
