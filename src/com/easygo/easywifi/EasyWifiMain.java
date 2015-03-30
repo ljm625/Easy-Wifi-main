@@ -1,10 +1,7 @@
 package com.easygo.easywifi;
 
 import android.app.*;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
+import android.content.*;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
@@ -40,6 +37,7 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
@@ -62,7 +60,7 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
             "Afghanistan", "Albania", "Algeria", "American Samoa", "Andorra",
             "Angola", "Anguilla", "Antarctica", "Antigua and Barbuda", "Argentina",
             "Armenia", "Aruba", "Australia", "Austria", "Azerbaijan"};
-    private static Handler handler2;
+    private static Handler handler2, handler3;
     private static View bdmap;
     public LocationClient mLocationClient = null;
     public BDLocationListener myListener = new MyLocationListener();
@@ -159,6 +157,9 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
                     request.setEntity(httpentity);
 
                     HttpClient httpclient = new DefaultHttpClient();
+                    httpclient.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 20000);
+                    // 检测超时
+                    httpclient.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, 20000);
                     HttpResponse httpResponse = httpclient.execute(request);
                     if (httpResponse.getStatusLine().getStatusCode() == 200) {
 
@@ -259,6 +260,18 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
         return false;
     }
 
+    public static boolean isApplicationBroughtToBackground(final Context context) {
+        ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningTaskInfo> tasks = am.getRunningTasks(1);
+        if (!tasks.isEmpty()) {
+            ComponentName topActivity = tasks.get(0).topActivity;
+            if (!topActivity.getPackageName().equals(context.getPackageName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void onDialogPositiveClick(DialogFragment dialog,String SSID,String passwd,Boolean encrypt1) {
         // User touched the dialog's positive button
 //        View DialogView =test.inflate(R.layout.infowin,null);
@@ -292,6 +305,7 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
         }
         //清空对话框
         infoDialog = null;
+        new CheckWifiStatus().start();
     }
 
 
@@ -514,8 +528,8 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
                 }
                 infoDialog = new InfoDialog();
                 infoDialog.show(getFragmentManager(), "Dialog", globalbundle);
-                //     speedTest=new SpeedTest();                            //测试用
-                //        speedTest.show(getFragmentManager(), "speed");
+                //  speedTest=new SpeedTest();                            //测试用
+                //    speedTest.show(getFragmentManager(), "speed");
                 boolean tmpopen = temp.getBoolean("isopen");
 
                 return true;
@@ -550,12 +564,12 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
                 infoDialog.show(getFragmentManager(), "Dialog", globalbundle);
             }
         }
-        if (speedTest != null) {
-            if (!infoDialog.isAdded()) {
-                speedTest.show(getFragmentManager(), "speed");
-            }
-        }
-//        mMapView.onResume();
+        //   if (speedTest != null) {
+        //        if (!speedTest.isAdded()) {
+        //            speedTest.show(getFragmentManager(), "speed");
+        //        }
+        //    }
+//       mMapView.onResume();
     }
 
     @Override
@@ -577,9 +591,9 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
 
 
        baidu.getBaidu().setMyLocationEnabled(true);
-        BitmapDescriptor mLocMarker = BitmapDescriptorFactory
-                .fromResource(R.drawable.custom_loc);
-        MyLocationConfiguration configuration=new MyLocationConfiguration(MyLocationConfiguration.LocationMode.NORMAL,false,mLocMarker);
+        //   BitmapDescriptor mLocMarker = BitmapDescriptorFactory
+        //           .fromResource(R.drawable.custom_loc);
+        MyLocationConfiguration configuration = new MyLocationConfiguration(MyLocationConfiguration.LocationMode.NORMAL, false, null);
         baidu.getBaidu().setMyLocationConfigeration(configuration);
 //        mMapView.showZoomControls(false);
         if (!mLocationClient.isStarted())
@@ -661,12 +675,26 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
         SDKInitializer.initialize(getApplicationContext());
 
 
-        handler2 = new Handler() {
+        handler3 = new Handler() {
+            public void handleMessage(Message msg) {
+                switch (msg.what) {
+                    case 2:
+                        StartSpeedTest();
+                        break;
+                }
+                super.handleMessage(msg);
+            }
+        };
+
+        handler2 = new Handler(EasyWifiMain.this.getMainLooper()) {
             public void handleMessage(Message msg) {
                 switch (msg.what) {
                     case 1:
                         Boolean test = getSetting();
                         if (test == true) notification();
+                        break;
+                    case 2:
+                        StartSpeedTest();
                         break;
                 }
                 super.handleMessage(msg);
@@ -731,7 +759,7 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
         getActionBar().setDisplayHomeAsUpEnabled(true);
         getActionBar().setHomeButtonEnabled(true);
         baidu = new MapFragmentOne();
-        getFragmentManager().beginTransaction().replace(R.id.content_frame, baidu).commit();
+        getFragmentManager().beginTransaction().replace(R.id.content_frame, baidu).commitAllowingStateLoss();
         // mMapView=fragment.getBaidu();
 
 
@@ -783,6 +811,15 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
         inflater.inflate(R.menu.mainactivity_menu, menu);
         return super.onCreateOptionsMenu(menu);
 
+    }
+
+    public void StartSpeedTest() {
+        if (isApplicationBroughtToBackground(EasyWifiMain.this)) {
+
+        } else {
+            speedTest = new SpeedTest();
+            speedTest.show(getFragmentManager(), "speed");
+        }
     }
 
     @Override
@@ -838,6 +875,34 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
             getActivity().setTitle("关于");
             return rootView;//gai
         }
+    }
+
+    class CheckWifiStatus extends Thread   //确认WIFI状态，决定是否进行测速
+    {  //TODO: 需要把设置选项判断的代码加进去
+        @Override
+        public void run() {
+
+            // TODO Auto-generated method stub
+            ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+            NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+            System.out.println("Output------>" + networkInfo.getTypeName());
+            String netstat = networkInfo.getTypeName().toString().trim();
+            while (!netstat.equals("WIFI")) {
+                try {
+                    connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+                    networkInfo = connectivityManager.getActiveNetworkInfo();
+                    netstat = networkInfo.getTypeName().toString().trim();
+                    Thread.sleep(2000);
+                    System.out.println("Info----->" + netstat);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            Message msg = new Message();
+            msg.what = 2;
+            handler3.sendMessage(msg);
+        }
+
     }
 
     public class WifiInfo   //2015.3.10 Changed by Ljm625 设置一个类当做结构体使用
@@ -903,19 +968,19 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
             if (i == 2) {
                 getFragmentManager().beginTransaction()
                         .replace(R.id.content_frame, new Settings())
-                        .commit();
+                        .commitAllowingStateLoss();
                 getActionBar().setTitle(R.string.app_settings);
             } else if (i == 0) {
-                getFragmentManager().beginTransaction().replace(R.id.content_frame, baidu).commit();
+                getFragmentManager().beginTransaction().replace(R.id.content_frame, baidu).commitAllowingStateLoss();
                 isFristLocation = true;
                 getActionBar().setTitle(R.string.app_name);
             } else if (i == 3) {
                 getActionBar().setTitle(R.string.app_about);
                 Fragment fragment = new InfoFragment();
-                getFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commit();
+                getFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commitAllowingStateLoss();
             } else {
                 getActionBar().setTitle(R.string.app_wifi);
-                getFragmentManager().beginTransaction().replace(R.id.content_frame, wifif).commit();
+                getFragmentManager().beginTransaction().replace(R.id.content_frame, wifif).commitAllowingStateLoss();
 
                 // wifif.UpdateText("fuck","fuck");
 

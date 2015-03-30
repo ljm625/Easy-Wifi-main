@@ -1,20 +1,13 @@
 package com.easygo.easywifi;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.DialogFragment;
-import android.app.FragmentManager;
-import android.content.Context;
+import android.app.*;
 import android.content.DialogInterface;
-import android.net.wifi.WifiConfiguration;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.app.Activity;
-import android.widget.Toast;
 
 
 
@@ -28,13 +21,8 @@ public class InfoDialog extends DialogFragment {
     WifiTest wifiadmin;
     EditText passwd;
     //LayoutInflater test=LayoutInflater.from(EasyWifiMain.class);
-
-    private TextView WifiSSid;
-    public interface NoticeDialogListener {
-        public void onDialogPositiveClick(DialogFragment dialog,String SSID,String passwd,Boolean encrypt1);
-        public void onDialogNegativeClick(DialogFragment dialog);
-    }
     NoticeDialogListener mListener;
+    private TextView WifiSSid;
 
     @Override
     public void onAttach(Activity activity) {
@@ -112,6 +100,7 @@ public class InfoDialog extends DialogFragment {
             })
                 .setNegativeButton(R.string.Button_Cancel, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
+                        mListener.onDialogNegativeClick(InfoDialog.this);
                         InfoDialog.this.getDialog().cancel();
                     }
                 });
@@ -128,6 +117,11 @@ public class InfoDialog extends DialogFragment {
         }
 
 
+    }
 
+    public interface NoticeDialogListener {
+        public void onDialogPositiveClick(DialogFragment dialog, String SSID, String passwd, Boolean encrypt1);
+
+        public void onDialogNegativeClick(DialogFragment dialog);
     }
 }
