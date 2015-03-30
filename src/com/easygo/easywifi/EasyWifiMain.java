@@ -54,7 +54,7 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
     // The dialog fragment receives a reference to this Activity through the
     // Fragment.onAttach() callback, which it uses to call the following methods
     // defined by the NoticeDialogFragment.NoticeDialogListener interface
-
+    //test
 
     static final String[] COUNTRIES = new String[]{
             "Afghanistan", "Albania", "Algeria", "American Samoa", "Andorra",
