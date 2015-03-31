@@ -42,11 +42,12 @@ import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
-//微博登陆用包
-import com.sina.*;
 
 import java.io.IOException;
 import java.util.*;
+
+//微博登陆用包
+//import com.sina.*;
 
 /**
  * Created by TrixZ on 2014/9/19.
