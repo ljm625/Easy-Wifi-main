@@ -42,6 +42,8 @@ import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
+//微博登陆用包
+import com.sina.*;
 
 import java.io.IOException;
 import java.util.*;
