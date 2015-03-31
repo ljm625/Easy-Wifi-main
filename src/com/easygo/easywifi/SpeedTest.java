@@ -3,6 +3,8 @@ package com.easygo.easywifi;
 
 import android.app.*;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -26,14 +28,16 @@ import java.net.URLConnection;
 public class SpeedTest extends DialogFragment {
 
     NoticeDialogListener1 mListener;
+    Bitmap bm, bufferbm[];
     private TextView tv_type, tv_now_speed, tv_ave_speed;
-    private ImageView needle;
+    private ImageView needle, tester;
     private Info info;
     private byte[] imageBytes;
     private boolean flag;
     private int last_degree = 0, cur_degree;
     private Looper lp;
     private boolean isfirst = true;
+    private int lastloc = 0, cur_loc, now_id;
     private Handler handler = new Handler() {
 
         @Override
@@ -47,6 +51,9 @@ public class SpeedTest extends DialogFragment {
             if (msg.what == 0x100) {
                 tv_now_speed.setText("0KB/S");
                 startAnimation(0);
+            }
+            if (msg.what == 0x321) {
+                tester.setImageResource(msg.arg1);
             }
         }
 
@@ -69,6 +76,32 @@ public class SpeedTest extends DialogFragment {
     public void show(FragmentManager manager, String tag) {
         super.show(manager, tag);
     }
+
+    public int SwitchThePercentage(int num)  //动画基础 改图
+    {
+        if (num != 0) num = num - 1;
+        String variableValue = "status_" + num;
+        return getResources().getIdentifier(variableValue, "drawable", SpeedTest.this.getActivity().getPackageName());
+    }
+
+
+  /*  class ExtractImg extends Thread
+    {
+
+        public void run() {
+
+              for (int i=0;i<61;i++)
+              {
+                  SwitchThePercentage(i);
+              }
+                        now_id=(i);
+                        bm =BitmapFactory.decodeResource(getResources(),now_id);
+                        // msg.what = 0x321;
+
+        }
+    }
+
+*/
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -101,9 +134,11 @@ public class SpeedTest extends DialogFragment {
                                 tv_now_speed = (TextView) SpeedTest.this.getDialog().findViewById(R.id.now_speed);
                                 tv_ave_speed = (TextView) SpeedTest.this.getDialog().findViewById(R.id.ave_speed);
                                 needle = (ImageView) SpeedTest.this.getDialog().findViewById(R.id.needle);
-
+                                tester = (ImageView) SpeedTest.this.getDialog().findViewById(R.id.tester);
+                                SwitchThePercentage(0);
                                 new DownloadThread().start();
                                 new GetInfoThread().start();
+                                new AnimationUI().start();
                             } catch (Exception e) {
 
                                 e.printStackTrace();
@@ -144,7 +179,7 @@ public class SpeedTest extends DialogFragment {
 
     private void startAnimation(int cur_speed) {
         cur_degree = getDegree(cur_speed);
-
+        //SwitchThePercentage(cur_degree/3);
         RotateAnimation rotateAnimation = new RotateAnimation(last_degree, cur_degree, Animation.RELATIVE_TO_SELF, 1.0f, Animation.RELATIVE_TO_SELF, 0.5f);
         rotateAnimation.setFillAfter(true);
         rotateAnimation.setDuration(1000);
@@ -170,10 +205,79 @@ public class SpeedTest extends DialogFragment {
     public void onResume() {
         super.onResume();
     }
+
     public interface NoticeDialogListener1 {
         public void onDialogPositiveClick1(DialogFragment dialog);
 
         public void onDialogNegativeClick1(DialogFragment dialog);
+    }
+
+    class AnimationUI extends Thread {
+
+        public void run() {
+            while (info.hadfinishByte < info.totalByte && flag) {
+                try {
+                    Thread.sleep(1000);
+
+                    cur_loc = (getDegree(((int) info.speed / 1024)) / 3);
+                    int i = lastloc;
+                    while (i != cur_loc) {
+                        Thread.sleep(2);
+                        // Message msg = new Message();
+                        now_id = SwitchThePercentage(i);
+                        bm = BitmapFactory.decodeResource(getResources(), now_id);
+                        // msg.what = 0x321;
+
+                        tester.post(new Runnable() {//另外一种更简洁的发送消息给ui线程的方法。
+
+                            @Override
+                            public void run() {//run()方法会在ui线程执行
+                                //  bitmap = Bitmap.createScaledBitmap(bitmap, scaleWidth, scaleHeight, true);
+                                // Resources res=new Resources();
+                                tester.setImageBitmap(bm);
+
+                            }
+                        });
+
+                        //    handler.sendMessage(msg);
+                        if (i > cur_loc) i--;
+                        else i++;
+                    }
+                    lastloc = cur_loc;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            cur_loc = 0;
+            int i = lastloc;
+            while (i != cur_loc) {
+                try {
+                    Thread.sleep(2);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                // Message msg = new Message();
+                now_id = SwitchThePercentage(i);
+                bm = BitmapFactory.decodeResource(getResources(), now_id);
+                // msg.what = 0x321;
+
+                tester.post(new Runnable() {//另外一种更简洁的发送消息给ui线程的方法。
+
+                    @Override
+                    public void run() {//run()方法会在ui线程执行
+                        //  bitmap = Bitmap.createScaledBitmap(bitmap, scaleWidth, scaleHeight, true);
+                        // Resources res=new Resources();
+                        tester.setImageBitmap(bm);
+
+                    }
+                });
+
+                //    handler.sendMessage(msg);
+                if (i > cur_loc) i--;
+                else i++;
+            }
+            lastloc = cur_loc;
+        }
     }
 
     public class Info //2015.3.28 Commited by Ljm625 此类为了进行测速数据的收集，相当于结构体

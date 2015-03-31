@@ -98,17 +98,21 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
             Bundle data = msg.getData();
 
             for (int i = 0; i < mlist.size(); i++) {
+
+
                 WifiInfo tmp = mlist.get(i);
-                Double latitude = tmp.latitude;
-                Double longtitude = tmp.longtitude;
-                SB = SB.append(" " + tmp.ssid + " ");
-                System.out.println("SSID-->" + tmp.ssid);
+                if (tmp.mac != null) {      //无网络检测
+                    Double latitude = tmp.latitude;
+                    Double longtitude = tmp.longtitude;
+                    SB = SB.append(" " + tmp.ssid + " ");
+                    System.out.println("SSID-->" + tmp.ssid);
 
-                System.out.println("Encrypt-->" + tmp.encryption);
+                    System.out.println("Encrypt-->" + tmp.encryption);
 
 
-                LatLng point = new LatLng(latitude, longtitude);
-                SetButton(i, tmp.ssid, point, tmp.encryption, tmp.signal);
+                    LatLng point = new LatLng(latitude, longtitude);
+                    SetButton(i, tmp.ssid, point, tmp.encryption, tmp.signal);
+                }
             }
             // TODO: UI界面的更新等相关操作
             //
@@ -218,14 +222,17 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
                         tmpwifi.passwd = result.getString("pass");
                     }
 
-                } catch (ClientProtocolException cp) {
-                    throw new RuntimeException(cp);
+                } catch (ClientProtocolException e) {
+                    e.printStackTrace();
+                    ;
 
-                } catch (IOException ie) {
-                    throw new RuntimeException(ie);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    ;
 
-                } catch (JSONException ex) {
-                    throw new RuntimeException(ex);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    ;
                 }
                 mlist.add(i, tmpwifi); //打包信息进入Wifiinfo的List 这样可以统一管理、类似结构体
                 System.out.println("The id is " + i);
@@ -814,7 +821,8 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
     }
 
     public void StartSpeedTest() {
-        if (isApplicationBroughtToBackground(EasyWifiMain.this)) {
+        System.out.println("BackgroundCheck----->" + isApplicationBroughtToBackground(EasyWifiMain.this.getApplicationContext()));
+        if (isApplicationBroughtToBackground(EasyWifiMain.this.getApplicationContext())) {
 
         } else {
             speedTest = new SpeedTest();
@@ -885,7 +893,7 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
             // TODO Auto-generated method stub
             ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
             NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-            System.out.println("Output------>" + networkInfo.getTypeName());
+            // System.out.println("Output------>" + networkInfo.getTypeName());
             String netstat = networkInfo.getTypeName().toString().trim();
             while (!netstat.equals("WIFI")) {
                 try {
