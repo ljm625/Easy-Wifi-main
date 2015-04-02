@@ -11,8 +11,6 @@ import android.os.Looper;
 import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -27,9 +25,9 @@ import java.net.URLConnection;
  */
 public class SpeedTest extends DialogFragment {
 
+    public TextView now_speed, ave_speed;
     NoticeDialogListener1 mListener;
     Bitmap bm, bufferbm[];
-    private TextView tv_type, tv_now_speed, tv_ave_speed;
     private ImageView needle, tester;
     private Info info;
     private byte[] imageBytes;
@@ -44,13 +42,15 @@ public class SpeedTest extends DialogFragment {
         public void handleMessage(Message msg) {
             // TODO Auto-generated method stub
             if (msg.what == 0x123) {
-                tv_now_speed.setText(msg.arg1 + "KB/S");
-                tv_ave_speed.setText(msg.arg2 + "KB/S");
-                startAnimation(msg.arg1);
+                String s = getString(R.string.ave);
+                now_speed.setText(msg.arg1 + "");
+                ave_speed.setText(s + " " + msg.arg2 + "kB/S");
+                //    startAnimation(msg.arg1);
             }
             if (msg.what == 0x100) {
-                tv_now_speed.setText("0KB/S");
-                startAnimation(0);
+                now_speed.setText("0");
+
+                //   startAnimation(0);
             }
             if (msg.what == 0x321) {
                 tester.setImageResource(msg.arg1);
@@ -130,10 +130,10 @@ public class SpeedTest extends DialogFragment {
                                 info.speed = 0;
                                 info.totalByte = 1024;
                                 flag = true;
-                                tv_type = (TextView) SpeedTest.this.getDialog().findViewById(R.id.connection_type);
-                                tv_now_speed = (TextView) SpeedTest.this.getDialog().findViewById(R.id.now_speed);
-                                tv_ave_speed = (TextView) SpeedTest.this.getDialog().findViewById(R.id.ave_speed);
-                                needle = (ImageView) SpeedTest.this.getDialog().findViewById(R.id.needle);
+                                now_speed = (TextView) SpeedTest.this.getDialog().findViewById(R.id.speedmeter);
+                                //   tv_type = (TextView) SpeedTest.this.getDialog().findViewById(R.id.connection_type);
+                                ave_speed = (TextView) SpeedTest.this.getDialog().findViewById(R.id.avespeed);
+                                //  needle = (ImageView) SpeedTest.this.getDialog().findViewById(R.id.needle);
                                 tester = (ImageView) SpeedTest.this.getDialog().findViewById(R.id.tester);
                                 SwitchThePercentage(0);
                                 new DownloadThread().start();
@@ -177,24 +177,24 @@ public class SpeedTest extends DialogFragment {
 
     }
 
-    private void startAnimation(int cur_speed) {
-        cur_degree = getDegree(cur_speed);
-        //SwitchThePercentage(cur_degree/3);
-        RotateAnimation rotateAnimation = new RotateAnimation(last_degree, cur_degree, Animation.RELATIVE_TO_SELF, 1.0f, Animation.RELATIVE_TO_SELF, 0.5f);
-        rotateAnimation.setFillAfter(true);
-        rotateAnimation.setDuration(1000);
-        last_degree = cur_degree;
-        needle.startAnimation(rotateAnimation);
-    }
-
+    /*  private void startAnimation(int cur_speed) {
+          cur_degree = getDegree(cur_speed);
+          //SwitchThePercentage(cur_degree/3);
+          RotateAnimation rotateAnimation = new RotateAnimation(last_degree, cur_degree, Animation.RELATIVE_TO_SELF, 1.0f, Animation.RELATIVE_TO_SELF, 0.5f);
+          rotateAnimation.setFillAfter(true);
+          rotateAnimation.setDuration(1000);
+          last_degree = cur_degree;
+        //  needle.startAnimation(rotateAnimation);
+      }
+  */
     private int getDegree(double cur_speed) {
         int ret = 0;
-        if (cur_speed >= 0 && cur_speed <= 512) {
-            ret = (int) (15.0 * cur_speed / 128.0);
-        } else if (cur_speed >= 512 && cur_speed <= 1024) {
-            ret = (int) (60 + 15.0 * cur_speed / 256.0);
-        } else if (cur_speed >= 1024 && cur_speed <= 10 * 1024) {
-            ret = (int) (90 + 15.0 * cur_speed / 1024.0);
+        if (cur_speed >= 0 && cur_speed <= 64) {
+            ret = (int) (15.0 * cur_speed / 16.0);
+        } else if (cur_speed >= 64 && cur_speed <= 256) {
+            ret = (int) (60 + 15.0 * cur_speed / 96.0);
+        } else if (cur_speed >= 256 && cur_speed <= 2048) {
+            ret = (int) (90 + 15.0 * cur_speed / 250.0);
         } else {
             ret = 180;
         }

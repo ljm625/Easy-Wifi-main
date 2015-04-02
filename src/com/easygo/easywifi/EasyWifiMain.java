@@ -536,11 +536,12 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
                 } else {
                     globalbundle.putBoolean("encrypt", true);
                 }
-                infoDialog = new InfoDialog();
-                infoDialog.show(getFragmentManager(), "Dialog", globalbundle);
-                //  speedTest=new SpeedTest();                            //测试用
-                //    speedTest.show(getFragmentManager(), "speed");
+                //     infoDialog = new InfoDialog();
+                //   infoDialog.show(getFragmentManager(), "Dialog", globalbundle);
+                speedTest = new SpeedTest();                            //测试用
+                speedTest.show(getFragmentManager(), "speed");
                 boolean tmpopen = temp.getBoolean("isopen");
+
 
                 return true;
             }
