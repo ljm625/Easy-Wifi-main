@@ -28,11 +28,12 @@ public class SpeedTest extends DialogFragment {
     public TextView now_speed, ave_speed;
     NoticeDialogListener1 mListener;
     Bitmap bm, bufferbm[];
+    DialogInterface truedlg;
     private ImageView needle, tester;
     private Info info;
     private byte[] imageBytes;
     private boolean flag;
-    private int last_degree = 0, cur_degree;
+    private int last_degree = 0, cur_degree, mesure_speed;
     private Looper lp;
     private boolean isfirst = true;
     private int lastloc = 0, cur_loc, now_id;
@@ -54,6 +55,9 @@ public class SpeedTest extends DialogFragment {
             }
             if (msg.what == 0x321) {
                 tester.setImageResource(msg.arg1);
+            }
+            if (msg.what == 0x666) {
+                CloseDialog();
             }
         }
 
@@ -102,7 +106,22 @@ public class SpeedTest extends DialogFragment {
     }
 
 */
+  public void CloseDialog() {
+      try {
+          Field field = truedlg.getClass().getSuperclass().getDeclaredField("mShowing");
 
+          field.setAccessible(true);
+
+          field.set(truedlg, true);
+
+          flag = false;
+
+          mListener.onDialogPositiveClick1(SpeedTest.this, mesure_speed);
+          SpeedTest.this.getDialog().cancel();
+      } catch (Exception e) {
+          e.printStackTrace();
+      }
+  }
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         info = new Info();
@@ -116,9 +135,8 @@ public class SpeedTest extends DialogFragment {
                     .setPositiveButton(R.string.Button_Connect, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int id) {
-                            mListener.onDialogPositiveClick1(SpeedTest.this);
                             try {
-
+                                truedlg = dialog;
                                 Field field = dialog.getClass().getSuperclass().getDeclaredField("mShowing");
 
                                 field.setAccessible(true);
@@ -207,7 +225,7 @@ public class SpeedTest extends DialogFragment {
     }
 
     public interface NoticeDialogListener1 {
-        public void onDialogPositiveClick1(DialogFragment dialog);
+        public void onDialogPositiveClick1(DialogFragment dialog, int speed);
 
         public void onDialogNegativeClick1(DialogFragment dialog);
     }
@@ -277,6 +295,10 @@ public class SpeedTest extends DialogFragment {
                 else i++;
             }
             lastloc = cur_loc;
+
+            Message msg = new Message();
+            msg.what = 0x666;
+            handler.sendMessage(msg);
         }
     }
 
@@ -354,6 +376,7 @@ public class SpeedTest extends DialogFragment {
                     Message msg = new Message();
                     msg.arg1 = ((int) info.speed / 1024);
                     msg.arg2 = (ave_speed / 1024);
+                    mesure_speed = (int) msg.arg2;
                     msg.what = 0x123;
                     handler.sendMessage(msg);
                 }

@@ -319,11 +319,12 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
     }
 
 
-    public void onDialogPositiveClick1(DialogFragment dialog) {
+    public void onDialogPositiveClick1(DialogFragment dialog, int speed) {
         // User touched the dialog's positive button
 //        View DialogView =test.inflate(R.layout.infowin,null);
         //    EditText passwd1=(EditText)DialogView.findViewById(R.id.password);
         //     String pass=passwd1.getText().toString();
+        System.out.println("SpeedMesure--->" + speed);
 
     }
 
@@ -1008,7 +1009,7 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
     public class MyLocationListener implements BDLocationListener {
         @Override
         public void onReceiveLocation(BDLocation location) {
-            System.out.println("data-->received");
+            //  System.out.println("data-->received");
             // map view 销毁后不在处理新接收的位置
             if (location == null)
                 return;
