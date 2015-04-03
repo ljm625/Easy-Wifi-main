@@ -2,14 +2,13 @@ package com.easygo.easywifi;
 /**
  * Created by yhy on 2014/9/17.
  */
+
 import android.content.Context;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-import android.os.Bundle;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class WifiTest {

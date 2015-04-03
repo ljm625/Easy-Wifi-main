@@ -46,8 +46,6 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.*;
 
-//微博登陆用包
-//import com.sina.*;
 
 /**
  * Created by TrixZ on 2014/9/19.
@@ -94,6 +92,8 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
     private int selectedColor = Color.parseColor("#1b1b1b");
     private ScanResult sr,sr1;
     private List<WifiInfo> mlist=new ArrayList<WifiInfo>();
+
+
     Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -246,7 +246,13 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
             handler.sendMessage(msg);
         }
     };
+
+
     private ActionBarDrawerToggle mDrawerToggle;
+
+    public EasyWifiMain(BaiduMap mBaiduMap) {
+        this.mBaiduMap = mBaiduMap;
+    }
 
     public static boolean isConnect(Context context) {
         // 获取手机所有连接管理对象（包括对wi-fi,net等连接的管理）

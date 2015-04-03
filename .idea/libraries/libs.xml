@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="libs">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../WeiboSDK/libs/android-support-v4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../WeiboSDK/libs/weibosdkcore.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../weibo_android_sdk-master/weibosdkcore_v3.0.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/weibosdkcore_v3.0.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

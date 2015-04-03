@@ -1,17 +1,14 @@
 package com.easygo.easywifi;
 
 import android.app.Fragment;
-import android.content.res.Configuration;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import com.baidu.mapapi.map.*;
-import com.baidu.mapapi.model.LatLng;
-
-import java.util.Map;
+import com.baidu.mapapi.map.BaiduMap;
+import com.baidu.mapapi.map.MapStatus;
+import com.baidu.mapapi.map.MapStatusUpdateFactory;
+import com.baidu.mapapi.map.MapView;
 
 /**
  * Created by TrixZ on 2014/12/14.
