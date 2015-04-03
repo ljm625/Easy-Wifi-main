@@ -20,6 +20,10 @@ import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.*;
 import android.widget.*;
+import cn.bidaround.ytcore.login.AuthListener;
+import cn.bidaround.ytcore.login.AuthLogin;
+import cn.bidaround.ytcore.login.AuthUserInfo;
+import cn.bidaround.ytcore.util.YtToast;
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
@@ -45,7 +49,8 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.*;
-
+//友推包
+import cn.bidaround.youtui_template.*;
 
 /**
  * Created by TrixZ on 2014/9/19.
@@ -127,8 +132,8 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
     private LinearLayout leftRL;
     private DrawerLayout drawerLayout;
     private boolean uploaded=false;
-    private int[] DrawerItemName={R.string.app_home,R.string.app_wifi,R.string.app_settings,R.string.app_about};
-    private int[] DrawerItemIcon={R.drawable.home,R.drawable.wifi2,R.drawable.settings,R.drawable.about};
+    private int[] DrawerItemName={R.string.app_home,R.string.app_wifi,R.string.app_settings,R.string.app_about,R.string.login};
+    private int[] DrawerItemIcon={R.drawable.home,R.drawable.wifi2,R.drawable.settings,R.drawable.about,R.layout.login_interview};
     private double mCurrentLantitude;
     private double mCurrentLongitude;
     Runnable networkTask = new Runnable() {
@@ -325,11 +330,12 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
     }
 
 
-    public void onDialogPositiveClick1(DialogFragment dialog) {
+    public void onDialogPositiveClick1(DialogFragment dialog, int speed) {
         // User touched the dialog's positive button
 //        View DialogView =test.inflate(R.layout.infowin,null);
         //    EditText passwd1=(EditText)DialogView.findViewById(R.id.password);
         //     String pass=passwd1.getText().toString();
+        System.out.println("SpeedMesure--->" + speed);
 
     }
 
@@ -542,11 +548,12 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
                 } else {
                     globalbundle.putBoolean("encrypt", true);
                 }
-                infoDialog = new InfoDialog();
-                infoDialog.show(getFragmentManager(), "Dialog", globalbundle);
-                //  speedTest=new SpeedTest();                            //测试用
-                //    speedTest.show(getFragmentManager(), "speed");
+                //     infoDialog = new InfoDialog();
+                //   infoDialog.show(getFragmentManager(), "Dialog", globalbundle);
+                speedTest = new SpeedTest();                            //测试用
+                speedTest.show(getFragmentManager(), "speed");
                 boolean tmpopen = temp.getBoolean("isopen");
+
 
                 return true;
             }
@@ -689,7 +696,8 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
         super.onCreate(savedInstanceState);
         isFristLocation = true;
         SDKInitializer.initialize(getApplicationContext());
-
+        /*初始化友推*/
+        YtTemplate.init(this);
 
         handler3 = new Handler() {
             public void handleMessage(Message msg) {
@@ -976,6 +984,76 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
             drawerLayout.closeDrawer(mDrawerList);
         }
     }
+    AuthListener authListener = new AuthListener() {
+
+        @Override
+        public void onAuthSucess(AuthUserInfo userInfo) {
+
+            YtToast.showS(EasyWifiMain.this, "onAuthSucess");
+
+            // 授权平台为QQ
+            if(userInfo.isQqPlatform()){
+                // 授权完成后返回的QQ用户信息
+                Log.w("QQ", userInfo.getQqUserInfoResponse());
+
+                Log.w("QQ", userInfo.getQqOpenid());
+                Log.w("QQ", userInfo.getQqGender());
+                Log.w("QQ", userInfo.getQqImageUrl());
+                Log.w("QQ", userInfo.getQqNickName());
+            }
+
+            // 授权平台为新浪
+            else if(userInfo.isSinaPlatform()){
+                // 授权完成后返回的新浪用户信息
+                Log.w("Sina", userInfo.getSinaUserInfoResponse());
+
+                Log.w("Sina", userInfo.getSinaUid());
+                Log.w("Sina", userInfo.getSinaGender());
+                Log.w("Sina", userInfo.getSinaName());
+                Log.w("Sina", userInfo.getSinaProfileImageUrl());
+                Log.w("Sina", userInfo.getSinaScreenname());
+                Log.w("Sina", userInfo.getSinaAccessToken());
+
+            }
+
+            // 授权平台为腾讯微博
+            else if(userInfo.isTencentWbPlatform()){
+                // 授权完成后返回的腾讯微博用户信息
+                Log.w("TencentWb", userInfo.getTencentUserInfoResponse());
+
+                Log.w("TencentWb", userInfo.getTencentWbOpenid());
+                Log.w("TencentWb", userInfo.getTencentWbName());
+                Log.w("TencentWb", userInfo.getTencentWbNick());
+                Log.w("TencentWb", userInfo.getTencentWbBirthday());
+                Log.w("TencentWb", userInfo.getTencentWbHead());
+                Log.w("TencentWb", userInfo.getTencentWbGender());
+            }
+
+            // 授权平台为微信
+            else if(userInfo.isWechatPlatform()){
+                // 授权完成后返回的微信用户信息
+                Log.w("Wechat", userInfo.getWeChatUserInfoResponse());
+
+                Log.w("Wechat", userInfo.getWechatOpenId());
+                Log.w("Wechat", userInfo.getWechatCountry());
+                Log.w("Wechat", userInfo.getWechatImageUrl());
+                Log.w("Wechat", userInfo.getWechatLanguage());
+                Log.w("Wechat", userInfo.getWechatNickName());
+                Log.w("Wechat", userInfo.getWechatProvince());
+                Log.w("Wechat", userInfo.getWechatSex());
+            }
+        }
+
+        @Override
+        public void onAuthFail() {
+            YtToast.showS(EasyWifiMain.this, "onAuthFail");
+        }
+
+        @Override
+        public void onAuthCancel() {
+            YtToast.showS(EasyWifiMain.this, "onAuthCancel");
+        }
+    };
 
     private class LeftDraweItemClickListener implements ListView.OnItemClickListener {
         @Override
@@ -995,6 +1073,9 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
                 getActionBar().setTitle(R.string.app_about);
                 Fragment fragment = new InfoFragment();
                 getFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commitAllowingStateLoss();
+            } else if (i == 4) {
+                    //弹出授权的界面
+                new AuthLogin().sinaAuth(EasyWifiMain.this, authListener);
             } else {
                 getActionBar().setTitle(R.string.app_wifi);
                 getFragmentManager().beginTransaction().replace(R.id.content_frame, wifif).commitAllowingStateLoss();
@@ -1013,7 +1094,7 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
     public class MyLocationListener implements BDLocationListener {
         @Override
         public void onReceiveLocation(BDLocation location) {
-            System.out.println("data-->received");
+            //  System.out.println("data-->received");
             // map view 销毁后不在处理新接收的位置
             if (location == null)
                 return;

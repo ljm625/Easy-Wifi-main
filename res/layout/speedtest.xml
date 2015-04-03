@@ -1,108 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="280dp"
-              android:layout_height="250dp"
-              android:orientation="vertical"
-
-              android:theme="@android:style/Theme.Holo.Dialog">
-    <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:background="@drawable/bg_speed">
-        <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical">
-            <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="#ffffff"
-                    android:singleLine="true"
-                    android:text="连接方式"/>
-            <TextView
-                    android:id="@+id/connection_type"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="#ffffff"
-                    android:singleLine="true"/>
-        </LinearLayout>
-
-        <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/bg_line"/>
-
-        <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical">
-            <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="#ffffff"
-                    android:text="当前速度"/>
-            <TextView
-                    android:id="@+id/now_speed"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="#ffffff"/>
-        </LinearLayout>
-
-        <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/bg_line"/>
-
-        <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical">
-            <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="#ffffff"
-                    android:text="平均速度"/>
-            <TextView
-                    android:id="@+id/ave_speed"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="#ffffff"/>
-        </LinearLayout>
-    </LinearLayout>
-
-
-    <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="250dp"
+                android:layout_height="300dp">
         <ImageView
                 android:id="@+id/tester"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="250dp"
+                android:layout_height="250dp"
+                android:scaleType="fitCenter"
                 android:layout_centerHorizontal="true"
                 android:src="@drawable/status_1"/>
-        <ImageView
-                android:id="@+id/needle"
-                android:layout_width="wrap_content"
+        <TextView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignRight="@+id/heart"
-                android:layout_alignBottom="@+id/heart"
-                android:layout_marginBottom="12dp"
-                android:layout_marginRight="13dp"
-                android:src="@drawable/ic_needle"/>
-        <ImageView
-                android:id="@+id/heart"
-                android:layout_width="26dp"
-                android:layout_height="26dp"
-                android:layout_marginBottom="11dp"
-                android:layout_centerHorizontal="true"
-                android:layout_alignBottom="@id/tester"
-                android:src="@drawable/ic_heart"/>
-    </RelativeLayout>
-</LinearLayout>
+                android:text="kB/s"
+                android:textStyle="normal"
+                android:textSize="20sp"
+                android:textColor="#aaaaaa"
+                android:paddingTop="170dp"
+                android:gravity="center"
+                android:typeface="monospace"/>
+        <TextView
+                android:id="@+id/speedmeter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textStyle="normal"
+                android:textSize="70sp"
+                android:typeface="monospace"
+                android:textColor="#0066FF"
+                android:layout_centerVertical="true"
+                android:paddingTop="-10dp"
+                android:gravity="center"/>
+
+        <TextView
+                android:id="@+id/avespeed"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="平均 0kB/s"
+                android:textStyle="normal"
+                android:textSize="20sp"
+                android:typeface="monospace"
+                android:textColor="#0066FF"
+                android:paddingTop="200dp"
+                android:layout_centerVertical="true"
+                android:gravity="center"/>
+</RelativeLayout>
