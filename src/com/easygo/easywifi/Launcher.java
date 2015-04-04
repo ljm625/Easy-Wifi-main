@@ -15,9 +15,10 @@ import android.widget.ImageView;
  * Created by TrixZ on 2014/9/22.
  */
 public class Launcher extends Activity implements AnimationListener {
+    Handler handler = new Handler();
     private ImageView  imageView = null;
     private Animation alphaAnimation = null;
-    Handler handler = new Handler();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

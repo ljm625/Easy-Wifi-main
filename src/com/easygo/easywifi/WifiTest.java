@@ -12,12 +12,12 @@ import android.net.wifi.WifiManager;
 import java.util.List;
 
 public class WifiTest {
+    WifiManager.WifiLock wifiLock;
     private WifiInfo mWifiInfo;
     private WifiInfo mWifiInfo2;
     private WifiManager mWifiManager;
     private List<ScanResult> mWifiList;
     private List<WifiConfiguration> mWifiConfiguration;
-    WifiManager.WifiLock wifiLock;
 
     public WifiTest(Context context){
         mWifiManager=(WifiManager) context.getSystemService(Context.WIFI_SERVICE);

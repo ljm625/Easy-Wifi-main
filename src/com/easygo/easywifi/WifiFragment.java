@@ -20,15 +20,15 @@ import java.util.TimerTask;
  */
 
 public  class WifiFragment extends Fragment {
-   private View rootView;
-    WifiTest wifiadmin;
+    private static Handler handler;
     public int counter = 0;
+    WifiTest wifiadmin;
     TextView tv;
     Timer timer = new Timer(true);
-    private static Handler handler;
+    AnimationDrawable frameAnimation;
+    private View rootView;
     private TextView ssid2,info2;
     private boolean isok=false;
-    AnimationDrawable frameAnimation;
     public WifiFragment() {
         // Empty constructor required for fragment subclasses
     }

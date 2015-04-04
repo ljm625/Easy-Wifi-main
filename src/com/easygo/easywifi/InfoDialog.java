@@ -16,7 +16,7 @@ import android.widget.TextView;
  */
 public class InfoDialog extends DialogFragment {
     Boolean encrypt;
-    String SSID1;
+    String SSID1, mac;
     int up,down,signal;
     WifiTest wifiadmin;
     EditText passwd;
@@ -40,6 +40,7 @@ public class InfoDialog extends DialogFragment {
     public void show(FragmentManager manager, String tag,Bundle savedinfo) {
         encrypt =savedinfo.getBoolean("encrypt");
         SSID1=savedinfo.getString("SSID");
+        mac = savedinfo.getString("mac");
         up=savedinfo.getInt("up");
         down=savedinfo.getInt("down");
         signal=savedinfo.getInt("signal");
@@ -62,7 +63,7 @@ public class InfoDialog extends DialogFragment {
                         public void onClick(DialogInterface dialog, int id) {
                             EditText passedit=(EditText)InfoDialog.this.getDialog().findViewById(R.id.password);
                             String pass=passedit.getText().toString();
-                            mListener.onDialogPositiveClick(InfoDialog.this,SSID1,pass,true);
+                            mListener.onDialogPositiveClick(InfoDialog.this, SSID1, pass, true, mac);
                             System.out.println("Clicked-->OK");   // sign in the user ...
                         }
                     })
@@ -95,7 +96,7 @@ public class InfoDialog extends DialogFragment {
                 @Override
                 public void onClick(DialogInterface dialog, int id) {
                     System.out.println("Clicked-->OK");
-                    mListener.onDialogPositiveClick(InfoDialog.this,SSID1,"",false);
+                    mListener.onDialogPositiveClick(InfoDialog.this, SSID1, "", false, mac);
                 }
             })
                 .setNegativeButton(R.string.Button_Cancel, new DialogInterface.OnClickListener() {
@@ -120,7 +121,7 @@ public class InfoDialog extends DialogFragment {
     }
 
     public interface NoticeDialogListener {
-        public void onDialogPositiveClick(DialogFragment dialog, String SSID, String passwd, Boolean encrypt1);
+        public void onDialogPositiveClick(DialogFragment dialog, String SSID, String passwd, Boolean encrypt1, String macaddr);
 
         public void onDialogNegativeClick(DialogFragment dialog);
     }
