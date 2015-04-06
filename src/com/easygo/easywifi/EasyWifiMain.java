@@ -536,9 +536,24 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
                 //  int down = r.nextInt(10);
 
                 System.out.println("Auth--->" + auth);
-
-
                 globalbundle = new Bundle();
+
+                //2015.4.6评级判断
+                if (signal >= 80 && down >= 200) {
+                    globalbundle.putInt("rate", 4);
+
+                } else if (signal >= 80 && down >= 100) {
+                    globalbundle.putInt("rate", 3);
+                } else if (signal >= 40 && down >= 30) {
+                    globalbundle.putInt("rate", 2);
+                } else if (signal >= 20) {
+                    globalbundle.putInt("rate", 1);
+                } else {
+                    globalbundle.putInt("rate", 0);
+                }
+
+
+
                 globalbundle.putString("SSID", SSID);
                 globalbundle.putInt("up", up);
                 globalbundle.putInt("down", down);
@@ -1043,6 +1058,22 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
                     String auth = tmp.encryption;
                     int down = tmp.downlink;
                     globalbundle = new Bundle();
+
+                    //2015.4.6评级判断
+                    if (level >= 80 && down >= 200) {
+                        globalbundle.putInt("rate", 4);
+
+                    } else if (level >= 80 && down >= 100) {
+                        globalbundle.putInt("rate", 3);
+                    } else if (level >= 40 && down >= 30) {
+                        globalbundle.putInt("rate", 2);
+                    } else if (level >= 20) {
+                        globalbundle.putInt("rate", 1);
+                    } else {
+                        globalbundle.putInt("rate", 0);
+                    }
+
+
                     globalbundle.putString("SSID", SSID);
                     globalbundle.putString("mac", sr1.BSSID);
                     globalbundle.putInt("up", 0);
@@ -1066,6 +1097,7 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
                     globalbundle.putInt("up", up);
                     globalbundle.putInt("down", down);
                     globalbundle.putInt("signal", 88);
+                    globalbundle.putInt("rate", 2);
                     if (auth.indexOf("ESS") >= 0) {
                         globalbundle.putBoolean("encrypt", false);
                     } else {
@@ -1086,6 +1118,7 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
                 globalbundle.putInt("up", up);
                 globalbundle.putInt("down", down);
                 globalbundle.putInt("signal", 88);
+                globalbundle.putInt("rate", 2);
                 if (auth.indexOf("ESS") >= 0) {
                     globalbundle.putBoolean("encrypt", false);
                 } else {

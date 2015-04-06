@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -17,7 +18,7 @@ import android.widget.TextView;
 public class InfoDialog extends DialogFragment {
     Boolean encrypt;
     String SSID1, mac;
-    int up,down,signal;
+    int up, down, signal, rate;
     WifiTest wifiadmin;
     EditText passwd;
     //LayoutInflater test=LayoutInflater.from(EasyWifiMain.class);
@@ -44,6 +45,7 @@ public class InfoDialog extends DialogFragment {
         up=savedinfo.getInt("up");
         down=savedinfo.getInt("down");
         signal=savedinfo.getInt("signal");
+        rate = savedinfo.getInt("rate");
         System.out.println("Encrypt-->"+encrypt);
         super.show(manager, tag);
 
@@ -74,8 +76,59 @@ public class InfoDialog extends DialogFragment {
                     });
             TextView SSID = (TextView)layout.findViewById(R.id.ssid1);
             SSID.setText(SSID1+"");
-            TextView upload=(TextView)layout.findViewById(R.id.up1);
-            upload.setText(up*100+"KB/S");
+            //TextView upload=(TextView)layout.findViewById(R.id.up1);
+            //upload.setText(up*100+"KB/S");
+            System.out.println("Ratings---->" + rate);
+            if (rate == 1) {
+
+                ImageView rate1 = (ImageView) layout.findViewById(R.id.rating1);
+                rate1.setAlpha((float) 100);
+                ImageView rate2 = (ImageView) layout.findViewById(R.id.rating2);
+                rate2.setAlpha((float) 0);
+                ImageView rate3 = (ImageView) layout.findViewById(R.id.rating3);
+                rate3.setAlpha((float) 0);
+                ImageView rate4 = (ImageView) layout.findViewById(R.id.rating4);
+                rate4.setAlpha((float) 0);
+            } else if (rate == 2) {
+                ImageView rate1 = (ImageView) layout.findViewById(R.id.rating1);
+                rate1.setAlpha((float) 100);
+                ImageView rate2 = (ImageView) layout.findViewById(R.id.rating2);
+                rate2.setAlpha((float) 100);
+                ImageView rate3 = (ImageView) layout.findViewById(R.id.rating3);
+                rate3.setAlpha((float) 0);
+                ImageView rate4 = (ImageView) layout.findViewById(R.id.rating4);
+                rate4.setAlpha((float) 0);
+            } else if (rate == 3) {
+                ImageView rate1 = (ImageView) layout.findViewById(R.id.rating1);
+                rate1.setAlpha((float) 100);
+                ImageView rate2 = (ImageView) layout.findViewById(R.id.rating2);
+                rate2.setAlpha((float) 100);
+                ImageView rate3 = (ImageView) layout.findViewById(R.id.rating3);
+                rate3.setAlpha((float) 100);
+                ImageView rate4 = (ImageView) layout.findViewById(R.id.rating4);
+                rate4.setAlpha((float) 0);
+            } else if (rate == 4) {
+                ImageView rate1 = (ImageView) layout.findViewById(R.id.rating1);
+                rate1.setAlpha((float) 100);
+                ImageView rate2 = (ImageView) layout.findViewById(R.id.rating2);
+                rate2.setAlpha((float) 100);
+                ImageView rate3 = (ImageView) layout.findViewById(R.id.rating3);
+                rate3.setAlpha((float) 100);
+                ImageView rate4 = (ImageView) layout.findViewById(R.id.rating4);
+                rate4.setAlpha((float) 100);
+            } else {
+                ImageView rate1 = (ImageView) layout.findViewById(R.id.rating1);
+                rate1.setAlpha((float) 0);
+                ImageView rate2 = (ImageView) layout.findViewById(R.id.rating2);
+                rate2.setAlpha((float) 0);
+                ImageView rate3 = (ImageView) layout.findViewById(R.id.rating3);
+                rate3.setAlpha((float) 0);
+                ImageView rate4 = (ImageView) layout.findViewById(R.id.rating4);
+                rate4.setAlpha((float) 0);
+            }
+
+
+
             TextView download=(TextView)layout.findViewById(R.id.down1);
             download.setText(down + "KB/S");
             ProgressBar proc = (ProgressBar)layout.findViewById(R.id.progressBar);
@@ -93,12 +146,12 @@ public class InfoDialog extends DialogFragment {
 
             builder.setView(layout)
                 .setPositiveButton(R.string.Button_Connect, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int id) {
-                    System.out.println("Clicked-->OK");
-                    mListener.onDialogPositiveClick(InfoDialog.this, SSID1, "", false, mac);
-                }
-            })
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        System.out.println("Clicked-->OK");
+                        mListener.onDialogPositiveClick(InfoDialog.this, SSID1, "", false, mac);
+                    }
+                })
                 .setNegativeButton(R.string.Button_Cancel, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         mListener.onDialogNegativeClick(InfoDialog.this);
@@ -107,8 +160,57 @@ public class InfoDialog extends DialogFragment {
                 });
             TextView SSID = (TextView)layout.findViewById(R.id.ssid2);
             SSID.setText(SSID1 + "");
-            TextView upload=(TextView)layout.findViewById(R.id.up2);
-            upload.setText(up*100+"KB/S");
+            // TextView upload=(TextView)layout.findViewById(R.id.up2);
+            // upload.setText(up*100+"KB/S");
+
+            if (rate == 1) {
+                ImageView rate1 = (ImageView) layout.findViewById(R.id.rating1);
+                rate1.setAlpha((float) 100);
+                ImageView rate2 = (ImageView) layout.findViewById(R.id.rating2);
+                rate2.setAlpha((float) 0);
+                ImageView rate3 = (ImageView) layout.findViewById(R.id.rating3);
+                rate3.setAlpha((float) 0);
+                ImageView rate4 = (ImageView) layout.findViewById(R.id.rating4);
+                rate4.setAlpha((float) 0);
+            } else if (rate == 2) {
+                ImageView rate1 = (ImageView) layout.findViewById(R.id.rating1);
+                rate1.setAlpha((float) 100);
+                ImageView rate2 = (ImageView) layout.findViewById(R.id.rating2);
+                rate2.setAlpha((float) 100);
+                ImageView rate3 = (ImageView) layout.findViewById(R.id.rating3);
+                rate3.setAlpha((float) 0);
+                ImageView rate4 = (ImageView) layout.findViewById(R.id.rating4);
+                rate4.setAlpha((float) 0);
+            } else if (rate == 3) {
+                ImageView rate1 = (ImageView) layout.findViewById(R.id.rating1);
+                rate1.setAlpha((float) 100);
+                ImageView rate2 = (ImageView) layout.findViewById(R.id.rating2);
+                rate2.setAlpha((float) 100);
+                ImageView rate3 = (ImageView) layout.findViewById(R.id.rating3);
+                rate3.setAlpha((float) 100);
+                ImageView rate4 = (ImageView) layout.findViewById(R.id.rating4);
+                rate4.setAlpha((float) 0);
+            } else if (rate == 4) {
+                ImageView rate1 = (ImageView) layout.findViewById(R.id.rating1);
+                rate1.setAlpha((float) 100);
+                ImageView rate2 = (ImageView) layout.findViewById(R.id.rating2);
+                rate2.setAlpha((float) 100);
+                ImageView rate3 = (ImageView) layout.findViewById(R.id.rating3);
+                rate3.setAlpha((float) 100);
+                ImageView rate4 = (ImageView) layout.findViewById(R.id.rating4);
+                rate4.setAlpha((float) 100);
+            } else {
+                ImageView rate1 = (ImageView) layout.findViewById(R.id.rating1);
+                rate1.setAlpha((float) 0);
+                ImageView rate2 = (ImageView) layout.findViewById(R.id.rating2);
+                rate2.setAlpha((float) 0);
+                ImageView rate3 = (ImageView) layout.findViewById(R.id.rating3);
+                rate3.setAlpha((float) 0);
+                ImageView rate4 = (ImageView) layout.findViewById(R.id.rating4);
+                rate4.setAlpha((float) 0);
+            }
+
+
             TextView download=(TextView)layout.findViewById(R.id.down2);
             download.setText(down + "KB/S");
             ProgressBar proc = (ProgressBar)layout.findViewById(R.id.progressBar);
