@@ -77,7 +77,7 @@ public class InfoDialog extends DialogFragment {
             TextView upload=(TextView)layout.findViewById(R.id.up1);
             upload.setText(up*100+"KB/S");
             TextView download=(TextView)layout.findViewById(R.id.down1);
-            download.setText(down*100+"KB/S");
+            download.setText(down + "KB/S");
             ProgressBar proc = (ProgressBar)layout.findViewById(R.id.progressBar);
             proc.setProgress(signal);
 
@@ -110,7 +110,7 @@ public class InfoDialog extends DialogFragment {
             TextView upload=(TextView)layout.findViewById(R.id.up2);
             upload.setText(up*100+"KB/S");
             TextView download=(TextView)layout.findViewById(R.id.down2);
-            download.setText(down*100+"KB/S");
+            download.setText(down + "KB/S");
             ProgressBar proc = (ProgressBar)layout.findViewById(R.id.progressBar);
             proc.setProgress(signal);
 
