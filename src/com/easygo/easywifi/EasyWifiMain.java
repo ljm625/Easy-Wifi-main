@@ -534,38 +534,27 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
         }
     }
 
-    public Boolean getSetting() {
+    public boolean getSetting(int num) {                     //------------------------------------------------------------>>
         SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(this);
 
-        // SharedPreferences prefs = getSharedPreferences("com.easygo.easywifi_settings", Context.MODE_WORLD_READABLE);
-        Boolean setdefault = prefs.getBoolean("quit_setting", false);  //false表示没有查到checkbox这个key的返回值
-        Boolean setupdate = prefs.getBoolean("update_check_setting", false);  //false表示没有查到checkbox这个key的返回值
-        Boolean setquit = prefs.getBoolean("default_setting", false);  //false表示没有查到checkbox这个key的返回值
-        Boolean setnotification =prefs.getBoolean("notification_setting", false);  //false表示没有查到checkbox这个key的返回值
-        // System.out.println(setnotification);
-        return setnotification;
+        boolean setting[]=new boolean[5];
+        setting[0]= prefs.getBoolean("auto_connect", false);  //false表示没有查到checkbox这个key的返回值
+        setting[1]=prefs.getBoolean("update_check_setting", false);
+        //setting[2]=prefs.getBoolean("notify_new_wifi_setting", false);
+        setting[3]=prefs.getBoolean("notification_setting",false);
+        setting[4]=prefs.getBoolean("quit_setting",false);
+        return setting[num];
     }
 
     private void notification(){
         String WifID=null;
-        android.net.wifi.WifiInfo wifiinfo=wifiadmin.checkinfo();
-        WifID=wifiinfo.getSSID().toString();
-        NotificationCompat.Builder mBuilder;
-        if (WifID=="0x")
-        {
-            mBuilder =
-                    new NotificationCompat.Builder(this)
-                            .setSmallIcon(R.drawable.wifi)
-                            .setContentTitle("EasyWifi is running ")
-                            .setContentText("Not Connected ");
-        }
-        else {
-            mBuilder =
-                    new NotificationCompat.Builder(this)
-                            .setSmallIcon(R.drawable.wifi)
-                            .setContentTitle("EasyWifi is running ")
-                            .setContentText("Connecting to " + WifID);
-        }
+        android.net.wifi.WifiInfo wifiInfo=wifiadmin.getConnection();
+        WifID=wifiInfo.getSSID().toString();
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.drawable.wifi)
+                        .setContentTitle("EasyWifi is running ")
+                        .setContentText("Connecting to "+WifID);
         Intent resultIntent = new Intent(this, EasyWifiMain.class);
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
         stackBuilder.addParentStack(EasyWifiMain.class);
@@ -582,7 +571,15 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
         mNotificationManager.notify(mId, mBuilder.build());
 
     }
+    private void informNewWifi(){         //------------------------------------------------------------------------>>
+        boolean inform_new_wifi=getSetting(2);
+        boolean found_new_wifi=true;
+        if(inform_new_wifi&&found_new_wifi){
 
+        }
+        else{}
+
+    }
     private void SetButton(int i, String SSID, LatLng point, String authtype, int signallevel, int downspeed)
     {
         Bundle extrainfo=new Bundle();
@@ -834,7 +831,7 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
             public void handleMessage(Message msg) {
                 switch (msg.what) {
                     case 1:
-                        Boolean test = getSetting();
+                        Boolean test = getSetting(3);
                         if (test == true) notification();
                         break;
                     case 2:
@@ -1313,7 +1310,34 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
             handler1.sendMessage(message);
         }
     }
-
+    private void showTips(){               //退出的提醒------------------------------------------------------------>>
+        AlertDialog alertDialog=new AlertDialog.Builder(EasyWifiMain.this)
+                .setTitle("提示")
+                .setMessage("是否退出程序")
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        EasyWifiMain.this.finish();
+                    }
+                })
+                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                return;
+                            }
+                        }
+                ).create();
+        alertDialog.show();
+    }
+    @Override
+    public  boolean onKeyDown(int keyCode,KeyEvent keyEvent){
+        boolean  quit_option=getSetting(4);
+        if(keyCode==KeyEvent.KEYCODE_BACK&& keyEvent.getRepeatCount()==0&&quit_option){
+            this.showTips();
+            return false;
+        }else
+            EasyWifiMain.this.onBackPressed();
+        return true;
+    }
     public class MyLocationListener implements BDLocationListener {
         @Override
         public void onReceiveLocation(BDLocation location) {

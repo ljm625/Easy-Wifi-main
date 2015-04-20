@@ -12,18 +12,19 @@
             android:summary="Preferences related to setting"
             android:title=" " >
         <SwitchPreference
-                android:key="quit_setting"
-                android:title="退出时提醒" />
+                android:key="auto_connect"
+                android:title="自动备份已连接热点" />
         <SwitchPreference
                 android:key="update_check_setting"
                 android:title="启动时检查升级" />
-        <SwitchPreference
-                android:key="default_setting"
-                android:title="设为默认wifi工具" />
+
         <SwitchPreference
                 android:key="notification_setting"
                 android:title="显示状态栏图标信息"
                 />
+        <SwitchPreference
+                android:key="quit_setting"
+                android:title="退出时提醒" />
 
     </PreferenceCategory>
 
