@@ -25,11 +25,7 @@
     <string name="speed_test">测速</string>
     <string name="ave">平均</string>
     <string name="unknown">未知</string>
-
-
-
-
-
+    <string name="login_button">登录</string>
 
 
 </resources>

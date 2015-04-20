@@ -3,6 +3,9 @@
   <component name="FacetManager">
     <facet type="android" name="Android">
       <configuration>
+        <proGuardCfgFiles>
+          <file>file://D:/Android/android-studio/sdk/sdk/tools/proguard/proguard-android.txt</file>
+        </proGuardCfgFiles>
         <option name="UPDATE_PROPERTY_FILES" value="true" />
       </configuration>
     </facet>
@@ -13,12 +16,11 @@
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/gen" isTestSource="false" generated="true" />
     </content>
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="Android SDK" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="BaiduLBS_Android" level="project" />
     <orderEntry type="library" name="locSDK_4.2" level="project" />
     <orderEntry type="library" name="android-support-v4" level="project" />
-    <orderEntry type="library" name="weibosdkcore_v3.0.1" level="project" />
+    <orderEntry type="library" name="YoutuiSDK_Core" level="project" />
   </component>
 </module>
-

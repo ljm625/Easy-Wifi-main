@@ -1,0 +1,19 @@
+<component name="libraryTable">
+  <library name="YoutuiSDK_Core">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/libs/YoutuiSDK_Core.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/YoutuiSDK_HttpClient.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/YoutuiSDK_Point.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/YoutuiSDK_QQ.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/YoutuiSDK_QQMta.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/YoutuiSDK_Renn.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/YouTuiSDK_SinaWeiBo.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/YoutuiSDK_Template.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/YoutuiSDK_TencentWB.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/YoutuiSDK_Wechat.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/YoutuiSDK_Yixin.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -3,6 +3,8 @@ package com.easygo.easywifi;
 import android.app.*;
 import android.content.*;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -20,6 +22,11 @@ import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.*;
 import android.widget.*;
+import cn.bidaround.youtui_template.YtTemplate;
+import cn.bidaround.ytcore.login.AuthListener;
+import cn.bidaround.ytcore.login.AuthLogin;
+import cn.bidaround.ytcore.login.AuthUserInfo;
+import cn.bidaround.ytcore.util.YtToast;
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
@@ -44,11 +51,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.*;
-
-//微博登陆用包
-//import com.sina.*;
-
 /**
  * Created by TrixZ on 2014/9/19.
  */
@@ -85,6 +91,7 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
     private float mCurrentAccracy;
     private SpeedTest speedTest;
     private InfoDialog infoDialog;
+    private Boolean islogin = false;
     private int mXDirection;
     private MapFragmentOne baidu;
     private int selectedIndex;
@@ -93,6 +100,8 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
     private Bundle globalbundle; //新添加修改SAVEDBUNDLE
     private int selectedColor = Color.parseColor("#1b1b1b");
     private ScanResult sr,sr1;
+    private Bitmap loginimg;
+    private String url_me;
     private WifiInfo CurrentWifi = new WifiInfo();
     private List<WifiInfo> mlist=new ArrayList<WifiInfo>();
     Handler handler = new Handler() {
@@ -122,14 +131,105 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
             //
         }
     };
+    //登录头像
+    private ImageView User_Image;
+    Handler handler1 = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            if (msg.what == 0x1234) {
+                User_Image = (ImageView) findViewById(R.id.imageView2);
+                User_Image.setImageBitmap(loginimg);
+            }
+        }
+    };
+    private TextView User_name;
+    private TextView User_kitname;
+    public AuthListener authListener = new AuthListener() {
+
+        @Override
+        public void onAuthSucess(AuthUserInfo userInfo) {
+
+            YtToast.showS(EasyWifiMain.this, "onAuthSucess");
+
+            // 授权平台为QQ
+            if (userInfo.isQqPlatform()) {
+                // 授权完成后返回的QQ用户信息
+                Log.w("QQ", userInfo.getQqUserInfoResponse());
+
+                Log.w("QQ", userInfo.getQqOpenid());
+                Log.w("QQ", userInfo.getQqGender());
+                Log.w("QQ", userInfo.getQqImageUrl());
+                Log.w("QQ", userInfo.getQqNickName());
+            }
+
+            // 授权平台为新浪
+            else if (userInfo.isSinaPlatform()) {
+                // 授权完成后返回的新浪用户信息
+                Log.w("Sina", userInfo.getSinaUserInfoResponse());
+
+                Log.w("Sina", userInfo.getSinaUid());
+                Log.w("Sina", userInfo.getSinaGender());
+                Log.w("Sina", userInfo.getSinaName());
+                Log.w("Sina_name", userInfo.getSinaProfileImageUrl());
+                Log.w("Sina", userInfo.getSinaScreenname());
+                Log.w("Sina", userInfo.getSinaAccessToken());
+
+                User_name = (TextView) findViewById(R.id.User_name);
+                User_kitname = (TextView) findViewById(R.id.User_kitname);
+                User_name.setText(userInfo.getSinaName());
+                User_kitname.setText(userInfo.getSinaScreenname());
+                url_me = userInfo.getSinaProfileImageUrl();
+                new BitMapUpdater().start();
+            }
+
+            // 授权平台为腾讯微博
+            else if (userInfo.isTencentWbPlatform()) {
+                // 授权完成后返回的腾讯微博用户信息
+                Log.w("TencentWb", userInfo.getTencentUserInfoResponse());
+
+                Log.w("TencentWb", userInfo.getTencentWbOpenid());
+                Log.w("TencentWb", userInfo.getTencentWbName());
+                Log.w("TencentWb", userInfo.getTencentWbNick());
+                Log.w("TencentWb", userInfo.getTencentWbBirthday());
+                Log.w("TencentWb", userInfo.getTencentWbHead());
+                Log.w("TencentWb", userInfo.getTencentWbGender());
+            }
+
+            // 授权平台为微信
+            else if (userInfo.isWechatPlatform()) {
+                // 授权完成后返回的微信用户信息
+                Log.w("Wechat", userInfo.getWeChatUserInfoResponse());
+
+                Log.w("Wechat", userInfo.getWechatOpenId());
+                Log.w("Wechat", userInfo.getWechatCountry());
+                Log.w("Wechat", userInfo.getWechatImageUrl());
+                Log.w("Wechat", userInfo.getWechatLanguage());
+                Log.w("Wechat", userInfo.getWechatNickName());
+                Log.w("Wechat", userInfo.getWechatProvince());
+                Log.w("Wechat", userInfo.getWechatSex());
+            }
+        }
+
+        @Override
+        public void onAuthFail() {
+            YtToast.showS(EasyWifiMain.this, "onAuthFail");
+        }
+
+        @Override
+        public void onAuthCancel() {
+            YtToast.showS(EasyWifiMain.this, "onAuthCancel");
+        }
+
+    };
     private WifiFragment wifif=new WifiFragment();
     private Long ts;
     private ListView mDrawerList,mLeftDrawer;
     private LinearLayout leftRL;
     private DrawerLayout drawerLayout;
     private boolean uploaded=false;
-    private int[] DrawerItemName = {R.string.app_home, R.string.app_wifi, R.string.app_settings, R.string.app_about};
-    private int[] DrawerItemIcon = {R.drawable.home, R.drawable.wifi2, R.drawable.settings, R.drawable.about};
+    private int[] DrawerItemName = {R.string.app_home, R.string.app_wifi, R.string.app_settings, R.string.app_about, R.string.login_button};
+    private int[] DrawerItemIcon = {R.drawable.home, R.drawable.wifi2, R.drawable.settings, R.drawable.about, R.drawable.login_button};
     private double mCurrentLantitude;
     private double mCurrentLongitude;
     Runnable networkTask = new Runnable() {
@@ -295,7 +395,7 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
     //    EditText passwd1=(EditText)DialogView.findViewById(R.id.password);
     //     String pass=passwd1.getText().toString();
         System.out.println("Wtf----->ok");
-       System.out.println("Wtf1----->"+passwd);
+       System.out.println("Wtf1----->" + passwd);
         if(!encrypt1){
             WifiConfiguration wifiConfig = wifiadmin.CreateWifiInfo(SSID,"",1);
             if (wifiConfig==null){
@@ -327,7 +427,6 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
         new CheckWifiStatus().start();
     }
 
-
     public void onDialogPositiveClick1(DialogFragment dialog, int speed) {
         // User touched the dialog's positive button
 //        View DialogView =test.inflate(R.layout.infowin,null);
@@ -347,7 +446,6 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
         //     String pass=passwd1.getText().toString();
         speedTest = null;
     }
-
 
     @Override
     public void onDialogNegativeClick(DialogFragment dialog) {
@@ -692,11 +790,16 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
         }
         for (int i = 0; i < DrawerItemName.length; i++) {
 
+
             Map<String, Object> map = new HashMap<String, Object>();
             map.put("text", EasyWifiMain.this.getString(DrawerItemName[i]));
 
             map.put("img_icon", DrawerItemIcon[i]);
             list2.add(map);
+            if (islogin) {
+                if (i == DrawerItemName.length - 1)
+                    i++;
+            }
         }
 
         return list2;
@@ -713,7 +816,8 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
         super.onCreate(savedInstanceState);
         isFristLocation = true;
         SDKInitializer.initialize(getApplicationContext());
-
+        // 友推分享平台初始化
+        YtTemplate.init(this);
 
         handler3 = new Handler() {
             public void handleMessage(Message msg) {
@@ -892,6 +996,23 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
         LatLng ll = new LatLng(mCurrentLantitude, mCurrentLongitude);
         MapStatusUpdate u = MapStatusUpdateFactory.newLatLng(ll);
         baidu.getBaidu().animateMapStatus(u);
+    }
+
+    public Bitmap returnBitMap(String url) {
+        URL myFileUrl;
+        Bitmap bitmap = null;
+        try {
+            myFileUrl = new URL(url);
+            HttpURLConnection conn = (HttpURLConnection) myFileUrl.openConnection();
+            conn.setConnectTimeout(0);
+            conn.setDoInput(true);
+            InputStream is = conn.getInputStream();
+            bitmap = BitmapFactory.decodeStream(is);
+            is.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return bitmap;
     }
 
     public static class InfoFragment extends Fragment {
@@ -1133,6 +1254,7 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
             drawerLayout.closeDrawer(mDrawerList);
         }
     }
+    //设定网络图片
 
     private class LeftDraweItemClickListener implements ListView.OnItemClickListener {
         @Override
@@ -1152,6 +1274,15 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
                 getActionBar().setTitle(R.string.app_about);
                 Fragment fragment = new InfoFragment();
                 getFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commitAllowingStateLoss();
+            } else if (i == 4) {
+                //检查是否有连接
+                if (wifiadmin.checkstate() == 3) {
+                    new AuthLogin().sinaAuth(EasyWifiMain.this, authListener);
+                    //new AuthLogin().wechatAuth(EasyWifiMain.this, authListener);
+                    //new AuthLogin().tencentWbAuth(EasyWifiMain.this, authListener);
+                } else {
+                    Toast.makeText(EasyWifiMain.this, "Wifi is unenable!", Toast.LENGTH_LONG).show();
+                }
             } else {
                 getActionBar().setTitle(R.string.app_wifi);
                 wifif.setWifiList(mlist);
@@ -1166,6 +1297,20 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
         private void selectItem(int i) {
             mLeftDrawer.setItemChecked(i, true);
             drawerLayout.closeDrawer(leftRL);
+        }
+    }
+
+    class BitMapUpdater extends Thread   //确认WIFI状态，决定是否进行测速
+    {  //TODO: 需要把设置选项判断的代码加进去
+        @Override
+        public void run() {
+            // TODO Auto-generated method stub
+            System.out.println("Running!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            loginimg = returnBitMap(url_me);
+            Message message = new Message();
+            message.what = 0x1234;
+            islogin = true;
+            handler1.sendMessage(message);
         }
     }
 
