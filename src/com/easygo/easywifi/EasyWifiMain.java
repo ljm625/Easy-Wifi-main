@@ -1012,6 +1012,36 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
         return bitmap;
     }
 
+    private void showTips() {               //退出的提醒------------------------------------------------------------>>
+        AlertDialog alertDialog = new AlertDialog.Builder(EasyWifiMain.this)
+                .setTitle(R.string.warning)
+                .setMessage(R.string.is_exit)
+                .setPositiveButton(R.string.cofirm, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        EasyWifiMain.this.finish();
+                    }
+                })
+                .setNegativeButton(R.string.Button_Cancel, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                return;
+                            }
+                        }
+                ).create();
+        alertDialog.show();
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent keyEvent) {
+        boolean quit_option = getSetting(4);
+        if (keyCode == KeyEvent.KEYCODE_BACK && keyEvent.getRepeatCount() == 0 && quit_option) {
+            this.showTips();
+            return false;
+        } else
+            EasyWifiMain.this.onBackPressed();
+        return true;
+    }
+
     public static class InfoFragment extends Fragment {
         public InfoFragment() {
 
@@ -1082,6 +1112,7 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
         }
 
     }
+    //设定网络图片
 
     public class UpdateSpeed extends Thread   //更新速度给服务器
     {
@@ -1251,7 +1282,6 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
             drawerLayout.closeDrawer(mDrawerList);
         }
     }
-    //设定网络图片
 
     private class LeftDraweItemClickListener implements ListView.OnItemClickListener {
         @Override
@@ -1310,34 +1340,7 @@ public class EasyWifiMain extends FragmentActivity implements InfoDialog.NoticeD
             handler1.sendMessage(message);
         }
     }
-    private void showTips(){               //退出的提醒------------------------------------------------------------>>
-        AlertDialog alertDialog=new AlertDialog.Builder(EasyWifiMain.this)
-                .setTitle("提示")
-                .setMessage("是否退出程序")
-                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        EasyWifiMain.this.finish();
-                    }
-                })
-                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                return;
-                            }
-                        }
-                ).create();
-        alertDialog.show();
-    }
-    @Override
-    public  boolean onKeyDown(int keyCode,KeyEvent keyEvent){
-        boolean  quit_option=getSetting(4);
-        if(keyCode==KeyEvent.KEYCODE_BACK&& keyEvent.getRepeatCount()==0&&quit_option){
-            this.showTips();
-            return false;
-        }else
-            EasyWifiMain.this.onBackPressed();
-        return true;
-    }
+
     public class MyLocationListener implements BDLocationListener {
         @Override
         public void onReceiveLocation(BDLocation location) {

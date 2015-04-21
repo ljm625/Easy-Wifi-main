@@ -25,6 +25,9 @@
     <string name="speed_test">测速</string>
     <string name="ave">平均</string>
     <string name="unknown">未知</string>
+    <string name="is_exit">是否退出程序</string>
+    <string name="cofirm">确定</string>
+    <string name="warning">提示</string>
     <string name="login_button">登录</string>
 
 
